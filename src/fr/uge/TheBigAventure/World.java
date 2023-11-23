@@ -1,11 +1,13 @@
 package fr.uge.TheBigAventure;
 
+import fr.uge.lexer.Lexer;
+import fr.uge.lexer.Result;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Objects;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class World {
 
@@ -41,33 +43,68 @@ public class World {
     encodings.forEach((key, value) -> this.encodings.put(key, value));
   }
 
-  static private int[] readSize(String Line) {
-    String[] split;
-    int height;
-    int width;
-    split = Line.split("\\(")[1].split("\\)");
+  static private int[] readSize(String line) {
+    int height = 0, width = 0;
+    String[] split = line.split("\\(")[1].split("\\)");
     height = Integer.parseInt(split[0].split("x")[0].split(" ")[0]);
     width = Integer.parseInt(split[0].split("x")[1].split(" ")[1]);
+    int[] tmp = { height, width };
+    return tmp;
+  }
+
+  static private int[] readSize(Lexer lexer) {
+    int height = 0, width = 0;
+
+    Result result;
+    for (int i = 0; i < 2; i++) {
+      while ((result = lexer.nextResult()) != null && !result.token().name().equals("NUMBER")) {
+      }
+      if (result.token().name().equals("NUMBER")) {
+        if (i == 0)
+          height = Integer.parseInt(result.content());
+        else
+          width = Integer.parseInt(result.content());
+      }
+    }
     int[] tmp = { height, width };
     return tmp;
 
   }
 
-  private static Map<String, String> readEncoding(String Line) {
-    String encodingsString = Line.split("encodings: ")[1];
+  private static Map<String, String> readEncoding(String line) {
+    HashMap<String, String> encodings = new HashMap<String, String>();
 
+    String encodingsString = line.split("encodings: ")[1];
     String currentName = "", currentEncoding = "";
     String values[] = encodingsString.split("\\) ");
-
-    HashMap<String, String> encodings = new HashMap<String, String>();
 
     for (int i = 0; i < values.length; i++) {
       String tmpString[] = values[i].split(" ");
       currentName = tmpString[0];
       currentEncoding = tmpString[1].replaceAll("(\\(|\\))", "");
-
       encodings.put(currentName, currentEncoding);
     }
+    return Map.copyOf(encodings);
+  }
+
+  private static Map<String, String> readEncoding(Lexer lexer) {
+    String currentName = "", currentEncoding = "";
+    HashMap<String, String> encodings = new HashMap<String, String>();
+
+    Result result;
+    while ((result = lexer.nextResult()) != null) {
+      if (result.token().name().equals("IDENTIFIER")) {
+        currentName = result.content();
+        while ((result = lexer.nextResult()) != null &&
+            !result.token().name().equals("IDENTIFIER")) {
+        }
+        currentEncoding = result.content();
+        encodings.put(currentName, currentEncoding);
+      } else if (result.token().name().equals("NEWLINE")) {
+        break;
+      }
+    }
+
     return Map.copyOf(encodings);
   }
 
@@ -75,7 +112,7 @@ public class World {
     int height = 0, width = 0;
     HashMap<String, String> encodings = new HashMap<String, String>();
 
-    try (var reader = Files.newBufferedReader(Paths.get("maps/" + file))) {
+    try (var reader = Files.newBufferedReader(Path.of("maps/").resolve(file))) {
       String line;
       while ((line = reader.readLine()) != null) {
         if (line.startsWith("size")) {
@@ -89,6 +126,34 @@ public class World {
           break;
       }
 
+    }
+    return new World(height, width, encodings);
+  }
+
+  public static World readMap(Path file) throws IOException {
+    int height = 0, width = 0;
+    HashMap<String, String> encodings = new HashMap<String, String>();
+
+    Path path = Path.of("maps/").resolve(file);
+    String text = Files.readString(path);
+    Lexer lexer = new Lexer(text);
+    Result result;
+
+    // TODO remplacer par un switch
+    while ((result = lexer.nextResult()) != null) {
+      System.out.println(result);
+      if (result.token().name().equals("IDENTIFIER")) {
+        if (result.content().equals("size")) {
+          int[] tmp;
+          tmp = readSize(lexer);
+          height = tmp[0];
+          width = tmp[1];
+        } else if (result.content().equals("encodings")) {
+          encodings.putAll(readEncoding(lexer));
+        } else if (result.content().equals("data")) {
+          break;
+        }
+      }
     }
     return new World(height, width, encodings);
   }
