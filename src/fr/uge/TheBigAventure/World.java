@@ -52,7 +52,7 @@ public class World {
     return tmp;
   }
 
-  static private int[] readSize(Lexer lexer) {
+  static private int[] readSize(Lexer lexer) throws IOException {
     int height = 0, width = 0;
 
     Result result;
@@ -66,6 +66,8 @@ public class World {
           width = Integer.parseInt(result.content());
       }
     }
+    if (height == 0 || width == 0)
+      throw new IOException("Error while reading size");
     int[] tmp = { height, width };
     return tmp;
 
@@ -87,7 +89,7 @@ public class World {
     return Map.copyOf(encodings);
   }
 
-  private static Map<String, String> readEncoding(Lexer lexer) {
+  private static Map<String, String> readEncoding(Lexer lexer) throws IOException {
     String currentName = "", currentEncoding = "";
     HashMap<String, String> encodings = new HashMap<String, String>();
 
@@ -99,7 +101,10 @@ public class World {
             !result.token().name().equals("IDENTIFIER")) {
         }
         currentEncoding = result.content();
-        encodings.put(currentName, currentEncoding);
+        if (!(encodings.putIfAbsent(currentEncoding, currentName) == null)) {
+          throw new IOException("Encoding already exist : " + currentEncoding + " -> " + currentName);
+        }
+
       } else if (result.token().name().equals("NEWLINE")) {
         break;
       }
@@ -145,11 +150,21 @@ public class World {
       if (result.token().name().equals("IDENTIFIER")) {
         if (result.content().equals("size")) {
           int[] tmp;
-          tmp = readSize(lexer);
+          try {
+            tmp = readSize(lexer);
+          } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Error while reading size");
+          }
           height = tmp[0];
           width = tmp[1];
         } else if (result.content().equals("encodings")) {
-          encodings.putAll(readEncoding(lexer));
+          try {
+            encodings.putAll(readEncoding(lexer));
+          } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Error while reading encodings");
+          }
         } else if (result.content().equals("data")) {
           break;
         }
