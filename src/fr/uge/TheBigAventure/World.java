@@ -15,8 +15,8 @@ public class World {
   // private final int[] arrayPow = { 0, 0 };
   private final int height;
   private final int width;
-  // private final char[] block;
-  private final HashMap<String, String> encodings = new HashMap<String, String>();
+  private final HashMap<String, String> encodings = new HashMap<>();
+  private final ArrayList<Items> existingItems;
 
   @Override
   public String toString() {
@@ -34,22 +34,14 @@ public class World {
     return sb.toString();
   }
 
-  public World(int x, int y, Map<String, String> encodings) {
+  public World(int x, int y, Map<String, String> encodings, ArrayList<Items> itemList) {
     Objects.requireNonNull(encodings);
+    Objects.requireNonNull(itemList);
     arrayWorld = new int[x][y];
     height = x;
     width = y;
-    // block = null;
     encodings.forEach((key, value) -> this.encodings.put(key, value));
-  }
-
-  static private int[] readSize(String line) {
-    int height = 0, width = 0;
-    String[] split = line.split("\\(")[1].split("\\)");
-    height = Integer.parseInt(split[0].split("x")[0].split(" ")[0]);
-    width = Integer.parseInt(split[0].split("x")[1].split(" ")[1]);
-    int[] tmp = { height, width };
-    return tmp;
+    existingItems = itemList;
   }
 
   static private int[] readSize(Lexer lexer) throws IOException {
