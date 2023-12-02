@@ -38,4 +38,16 @@ public class Lexer {
     throw new AssertionError();
   }
 
+  public Result lastResult() {
+    for (var group = 1; group <= matcher.groupCount(); group++) {
+      var start = matcher.start(group);
+      if (start != -1) {
+        var end = matcher.end(group);
+        var content = text.substring(start, end);
+        return new Result(TOKENS.get(group - 1), content);
+      }
+    }
+    throw new AssertionError();
+  }
+
 }
