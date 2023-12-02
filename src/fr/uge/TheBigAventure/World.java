@@ -77,8 +77,6 @@ public class World {
           throw new IOException("Encoding already exist : " + currentEncoding + " -> " + currentName);
         }
 
-      } else if (result.token().name().equals("NEWLINE")) {
-        break;
       }
     }
 
