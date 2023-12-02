@@ -53,40 +53,16 @@ public class World {
   }
 
   static private int[] readSize(Lexer lexer) throws IOException {
-    int height = 0, width = 0;
-
+    int[] tmp = { 0, 0 };
     Result result;
     for (int i = 0; i < 2; i++) {
       while ((result = lexer.nextResult()) != null && !result.token().name().equals("NUMBER")) {
       }
-      if (result.token().name().equals("NUMBER")) {
-        if (i == 0)
-          height = Integer.parseInt(result.content());
-        else
-          width = Integer.parseInt(result.content());
-      }
+      tmp[i] = Integer.parseInt(result.content());
     }
-    if (height == 0 || width == 0)
+    if (tmp[0] <= 0 || tmp[1] <= 0)
       throw new IOException("Error while reading size");
-    int[] tmp = { height, width };
     return tmp;
-
-  }
-
-  private static Map<String, String> readEncoding(String line) {
-    HashMap<String, String> encodings = new HashMap<String, String>();
-
-    String encodingsString = line.split("encodings: ")[1];
-    String currentName = "", currentEncoding = "";
-    String values[] = encodingsString.split("\\) ");
-
-    for (int i = 0; i < values.length; i++) {
-      String tmpString[] = values[i].split(" ");
-      currentName = tmpString[0];
-      currentEncoding = tmpString[1].replaceAll("(\\(|\\))", "");
-      encodings.put(currentName, currentEncoding);
-    }
-    return Map.copyOf(encodings);
   }
 
   private static Map<String, String> readEncoding(Lexer lexer) throws IOException {
