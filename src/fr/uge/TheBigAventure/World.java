@@ -63,13 +63,17 @@ public class World {
 
     Result result;
     while ((result = lexer.nextResult()) != null) {
+      currentName = result.content();
       if (result.token().name().equals("IDENTIFIER")) {
-        currentName = result.content();
+        if (currentName.equals("data")) {
+          break;
+        }
         while ((result = lexer.nextResult()) != null &&
             !result.token().name().equals("IDENTIFIER")) {
         }
         currentEncoding = result.content();
-        if (!(encodings.putIfAbsent(currentEncoding, currentName) == null)) {
+        var res = encodings.putIfAbsent(currentEncoding, currentName);
+        if (!(res == null)) {
           throw new IOException("Encoding already exist : " + currentEncoding + " -> " + currentName);
         }
 
@@ -126,16 +130,28 @@ public class World {
           }
           height = tmp[0];
           width = tmp[1];
-        } else if (result.content().equals("encodings")) {
+
+        }
+        if (result.content().equals("encodings") ||
+            lexer.lastResult().content().equals("encodings")) {
           try {
             encodings.putAll(readEncoding(lexer));
           } catch (IOException e) {
             e.printStackTrace();
             throw new IOException("Error while reading encodings");
           }
-        } else if (result.content().equals("data")) {
-          break;
+
         }
+        if (result.content().equals("data") || lexer.lastResult().content().equals("data")) {
+          try {
+            // var res =
+            readData(lexer);
+
+          } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Error while reading map data");
+          }
+
       }
     }
     return new World(height, width, encodings);
