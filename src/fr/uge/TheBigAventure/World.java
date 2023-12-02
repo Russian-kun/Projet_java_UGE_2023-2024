@@ -84,8 +84,13 @@ public class World {
   }
 
   public static World readMap(String file) throws IOException {
-    int height = 0, width = 0;
-    HashMap<String, String> encodings = new HashMap<String, String>();
+    try {
+      return readMap(Path.of(file));
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new IOException("Error while reading map");
+    }
+  }
 
     try (var reader = Files.newBufferedReader(Path.of("maps/").resolve(file))) {
       String line;
