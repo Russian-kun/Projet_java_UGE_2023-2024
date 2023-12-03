@@ -20,19 +20,17 @@
         </javac>
     </target>
 
-    <!-- Tache pour creer le jar executable -->
+    <!-- Tâche pour créer le jar exécutable -->
     <target name="jar" depends="compile">
         <mkdir dir="${jar.dir}"/>
-        <jar destfile="${jar.dir}/thebigadventure.jar">
-            <manifest>
-                <attribute name="Main-Class" value="fr.uge.TheBigAventure.Main"/>
-            </manifest>
+        <jar destfile="${jar.dir}/thebigadventure.jar" manifest="${basedir}/manifest.mf">
             <fileset dir="${classes.dir}"/>
             <fileset dir="${lib.dir}" includes="*.jar"/>
             <fileset dir="${maps.dir}" includes="*.map"/>
             <fileset dir="${docs.dir}" includes="user.pdf, dev.pdf"/>
         </jar>
     </target>
+
 
     <!-- Tache pour generer la Javadoc -->
     <target name="javadoc" depends="compile">
