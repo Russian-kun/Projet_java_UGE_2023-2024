@@ -1,5 +1,7 @@
 package fr.uge.TheBigAventure;
 
+import java.util.Objects;
+
 /**
  * Class representant les obstacles du jeu.
  * 
@@ -8,7 +10,7 @@ package fr.uge.TheBigAventure;
  */
 public class Obstacles {
   private final Type type;
-  private final Character character;
+  private final Characters character;
 
   /**
    * Enum des noms possibles des obstacles.
@@ -18,7 +20,9 @@ public class Obstacles {
     PILLAR, PIPE, ROCK, RUBBLE, SHELL, SIGN, SPIKE, STATUE, STUMP, TABLE, TOWER, TREE, TREES, WALL
   }
 
-  public Obstacles(Type name, Character character) {
+  public Obstacles(Type name, Characters character) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(character);
     this.type = name;
     this.character = character;
   }
