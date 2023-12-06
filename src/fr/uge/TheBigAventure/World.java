@@ -64,9 +64,6 @@ public class World {
     while ((result = lexer.nextResult()) != null) {
       currentName = result.content();
       if (result.token().name().equals("IDENTIFIER")) {
-        if (currentName.equals("data")) {
-          break;
-        }
         while ((result = lexer.nextResult()) != null &&
             !result.token().name().equals("IDENTIFIER")) {
         }
@@ -76,6 +73,8 @@ public class World {
           throw new IOException("Encoding already exist : " + currentEncoding + " -> " + currentName);
         }
 
+      } else if (result.token().name().equals("HEADER")) {
+        break;
       }
     }
 
@@ -112,22 +111,43 @@ public class World {
     return map;
   }
 
-    try (var reader = Files.newBufferedReader(Path.of("maps/").resolve(file))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (line.startsWith("size")) {
-          int[] tmp;
-          tmp = readSize(line.split("\n")[0]);
-          height = tmp[0];
-          width = tmp[1];
-        } else if (line.startsWith("encodings"))
-          encodings.putAll(readEncoding(line.split("\n")[0]));
-        else if (line.startsWith("data: "))
-          break;
+  private static Element readElement(Lexer lexer) throws IOException {
+    // player, item, enemy, obstacle, vehicle
+    // Pour l'instant: player, item, obstacle, enemy
+    Result result;
+    HashMap<String, String> attributes = new HashMap<String, String>();
+
+    while ((result = lexer.nextResult()) != null) {
+      if (!result.token().name().equals("IDENTIFIER"))
+        break;
+      String name = result.content();
+      while ((result = lexer.nextResult()) != null && result.token().name().equals("COLON")) {
       }
+      String value = result.content();
+      if (value.equals(""))
+        throw new IOException("Error while reading element");
+      attributes.put(name, value);
 
     }
-    return new World(height, width, encodings);
+
+    if (attributes.containsKey("player")) {
+      attributes.put("kind", "player");
+    }
+
+    switch (attributes.get("kind")) {
+      case "player":
+        return new Player(attributes);
+      case "item":
+        if (attributes.get("damage") != null)
+          return new Weapon(attributes);
+        return new Item(attributes);
+      case "obstacle":
+        return new Obstacle(attributes);
+      case "enemy":
+        return new Enemy(attributes);
+      default:
+        return null;
+    }
   }
 
   public static World readMap(Path file) throws IOException {
@@ -141,11 +161,12 @@ public class World {
     String[][] map = null;
     Result result;
 
-    // TODO remplacer par un switch
     while ((result = lexer.nextResult()) != null) {
       System.out.println(result);
-      if (result.token().name().equals("IDENTIFIER")) {
-        if (result.content().equals("size")) {
+      if (!result.token().name().equals("HEADER"))
+        continue;
+      switch (result.content()) {
+        case "size:":
           int[] tmp;
           try {
             tmp = readSize(lexer);
@@ -153,33 +174,45 @@ public class World {
             e.printStackTrace();
             throw new IOException("Error while reading size");
           }
-          height = tmp[0];
-          width = tmp[1];
+          width = tmp[0];
+          height = tmp[1];
 
-        }
-        if (result.content().equals("encodings") ||
-            lexer.lastResult().content().equals("encodings")) {
+          break;
+
+        case "encodings:":
           try {
             encodings.putAll(readEncoding(lexer));
+            lexer = new Lexer(text.substring(lexer.lastResult().start()));
           } catch (IOException e) {
             e.printStackTrace();
             throw new IOException("Error while reading encodings");
           }
+          break;
 
-        }
-        if (result.content().equals("data") || lexer.lastResult().content().equals("data")) {
+        case "data:":
           try {
-            // var res =
-            readData(lexer);
-
+            map = readData(lexer);
+            if (map.length != height || map[0].length != width)
+              throw new IOException("Inconsistant map size");
           } catch (IOException e) {
             e.printStackTrace();
             throw new IOException("Error while reading map data");
           }
+          break;
 
+        case "[element]":
+          try {
+            Element tmp2 = readElement(lexer);
+            existingItems.add(tmp2);
+            lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
+          } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Error while reading map elements");
+          }
+          break;
       }
-    }
-    return new World(height, width, encodings);
-  }
 
+    }
+    return new World(height, width, encodings, existingItems);
+  }
 }
