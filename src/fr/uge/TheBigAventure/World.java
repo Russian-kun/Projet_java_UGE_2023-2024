@@ -82,13 +82,34 @@ public class World {
     return Map.copyOf(encodings);
   }
 
-  public static World readMap(String file) throws IOException {
-    try {
-      return readMap(Path.of(file));
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Error while reading map");
+  public static String[][] readData(Lexer lexer) throws IOException {
+    Result result;
+    int width = 0, height = 0;
+    // On cherche le debut de la map
+    while ((result = lexer.nextResult()) != null && !result.token().name().equals("QUOTE")) {
     }
+
+    var split = result.content().split("\\n");
+    height = split.length - 2;
+    width = split[1].strip().length();
+    String[][] map = new String[height][width];
+
+    for (int currHeight = 1; currHeight < height + 1; currHeight++) {
+      String s = split[currHeight].strip();
+
+      if (width != s.length())
+        throw new IOException("Inconsistant map width");
+
+      String[] individualChars = s.split("");
+      int currWidth = 0;
+
+      for (String tmp2 : individualChars) {
+        if (!tmp2.equals(" "))
+          map[currHeight - 1][currWidth] = tmp2;
+        currWidth++;
+      }
+    }
+    return map;
   }
 
     try (var reader = Files.newBufferedReader(Path.of("maps/").resolve(file))) {
@@ -112,10 +133,12 @@ public class World {
   public static World readMap(Path file) throws IOException {
     int height = 0, width = 0;
     HashMap<String, String> encodings = new HashMap<String, String>();
+    ArrayList<Element> existingItems = new ArrayList<Element>();
 
     Path path = Path.of("maps/").resolve(file);
     String text = Files.readString(path);
     Lexer lexer = new Lexer(text);
+    String[][] map = null;
     Result result;
 
     // TODO remplacer par un switch
