@@ -1,7 +1,11 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.personnages;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import fr.uge.TheBigAventure.general.Position;
+import fr.uge.TheBigAventure.objects.Element;
+import fr.uge.TheBigAventure.objects.Item;
 
 public class Player extends Element {
   private String name;
@@ -11,6 +15,8 @@ public class Player extends Element {
   // Constructeur
   public Player(String name, String skin, Position position, int health) {
     super(skin, position, Element.Kind.PLAYER);
+    if (Characters.valueOf(skin.toUpperCase()) == null)
+      throw new IllegalArgumentException("skin must be a character");
     this.health = health;
     this.name = name;
     if (health < 0)
@@ -19,6 +25,8 @@ public class Player extends Element {
 
   public Player(Map<String, String> attributes) {
     super(attributes);
+    if (Characters.valueOf(skin.toUpperCase()) == null)
+      throw new IllegalArgumentException("skin must be a character");
     this.health = Integer.parseInt(attributes.get("health"));
     if (health < 0)
       throw new IllegalArgumentException("health must be positive");

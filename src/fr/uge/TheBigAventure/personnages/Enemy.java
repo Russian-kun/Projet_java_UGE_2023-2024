@@ -1,6 +1,10 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.personnages;
 
 import java.util.Map;
+
+import fr.uge.TheBigAventure.general.Position;
+import fr.uge.TheBigAventure.general.Zone;
+import fr.uge.TheBigAventure.objects.Element;
 
 // un ennemi est défini comme cela
 //                   [element]
@@ -12,7 +16,7 @@ import java.util.Map;
 //                     zone: (1, 1) (5 x 3)
 //                     behavior: agressive
 //                     damage: 10
-class Enemy extends Element {
+public class Enemy extends Element {
   private String name;
   private int health;
   private Zone zone;
@@ -33,6 +37,9 @@ class Enemy extends Element {
     if (health < 0)
       throw new IllegalArgumentException("health must be positive");
 
+    if (Characters.valueOf(skin.toUpperCase()) == null)
+      throw new IllegalArgumentException("skin must be a character");
+
     this.name = name;
     this.health = health;
 
@@ -49,6 +56,8 @@ class Enemy extends Element {
 
   public Enemy(Map<String, String> attributes) {
     super(attributes);
+    if (Characters.valueOf(skin.toUpperCase()) == null)
+      throw new IllegalArgumentException("skin must be a character");
     this.health = Integer.parseInt(attributes.get("health"));
     this.damage = Integer.parseInt(attributes.get("damage"));
     if (damage < 0)

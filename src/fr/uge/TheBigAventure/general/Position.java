@@ -1,6 +1,6 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.general;
 
-class Position {
+public class Position {
     private int x;
     private int y;
 

@@ -1,5 +1,5 @@
 
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.display;
 
 import static java.lang.Math.min;
 
@@ -7,12 +7,13 @@ import java.awt.Graphics2D;
 import java.util.Map;
 import java.util.Objects;
 
+import fr.uge.TheBigAventure.general.World;
 import fr.umlv.zen5.ApplicationContext;
 
 /**
  * Affichage
  */
-public class Affichage {
+public class Display {
   private final World world;
   ApplicationContext context;
   private final float caseSize;
@@ -20,7 +21,7 @@ public class Affichage {
   private final float shiftY;
   private final Map<String, String> encodings;
 
-  public Affichage(World world, ApplicationContext context) {
+  public Display(World world, ApplicationContext context) {
     Objects.requireNonNull(context);
     Map<String, String> encodings = world.encodings();
     float screenWidth = context.getScreenInfo().getWidth(), screenHeight = context.getScreenInfo().getHeight();
@@ -53,9 +54,6 @@ public class Affichage {
     for (int i = 0; i < world.height(); i++) {
       for (int j = 0; j < world.width(); j++)
         if (map[i][j] != null)
-          // graphics.drawString(encodings.get(map[i][j]), j * 20, i * 20);
-          // On va chercher l'image correspondante dans le dossier images
-          // Les images sont nommées comme suit : NOM_0.webp
           graphics.drawImage(Image.getImage(encodings.get(map[i][j])),
               (int) (j * caseSize + shiftX),
               (int) (i * caseSize + shiftY),

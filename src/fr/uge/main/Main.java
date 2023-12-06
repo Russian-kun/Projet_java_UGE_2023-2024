@@ -2,8 +2,9 @@ package fr.uge.main;
 
 import java.io.IOException;
 
-import fr.uge.TheBigAventure.Affichage;
-import fr.uge.TheBigAventure.World;
+import fr.uge.TheBigAventure.display.Display;
+import fr.uge.TheBigAventure.general.World;
+
 import java.nio.file.Path;
 import java.awt.Color;
 import fr.umlv.zen5.*;
@@ -14,7 +15,7 @@ public class Main {
       try {
         World world = World.readMap(Path.of("monster_house.map"));
 
-        Affichage affichage = new Affichage(world, context);
+        Display affichage = new Display(world, context);
 
         // On redimensionne les images
         context.renderFrame(graphics -> {

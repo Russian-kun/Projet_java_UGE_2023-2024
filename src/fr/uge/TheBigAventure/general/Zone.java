@@ -1,7 +1,7 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.general;
 
 // Classe représentant la zone d'un ennemi
-class Zone {
+public class Zone {
   private Position topLeft;
   private int width;
   private int height;

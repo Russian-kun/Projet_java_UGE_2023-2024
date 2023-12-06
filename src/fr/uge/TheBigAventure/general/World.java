@@ -1,5 +1,11 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.general;
 
+import fr.uge.TheBigAventure.objects.Element;
+import fr.uge.TheBigAventure.objects.Item;
+import fr.uge.TheBigAventure.objects.Obstacles;
+import fr.uge.TheBigAventure.objects.Weapon;
+import fr.uge.TheBigAventure.personnages.Enemy;
+import fr.uge.TheBigAventure.personnages.Player;
 import fr.uge.lexer.Lexer;
 import fr.uge.lexer.Result;
 import java.io.IOException;
@@ -29,9 +35,7 @@ public record World(int height, int width, String[][] map, Map<String, String> e
     return sb.toString();
   }
 
-  public World
-
-  {
+  public World {
     Objects.requireNonNull(encodings);
     Objects.requireNonNull(existingItems);
     Objects.requireNonNull(map);
@@ -133,7 +137,7 @@ public record World(int height, int width, String[][] map, Map<String, String> e
           return new Weapon(attributes);
         return new Item(attributes);
       case "obstacle":
-        return new Obstacle(attributes);
+        return new Obstacles(attributes);
       case "enemy":
         return new Enemy(attributes);
       default:

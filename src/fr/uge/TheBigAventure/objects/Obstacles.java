@@ -1,8 +1,10 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.objects;
 
 import java.util.Map;
 
-class Obstacle extends Element {
+import fr.uge.TheBigAventure.general.Position;
+
+public class Obstacles extends Element {
   private String name;
 
   public enum ObstacleType {
@@ -10,12 +12,12 @@ class Obstacle extends Element {
     PILLAR, PIPE, ROCK, RUBBLE, SHELL, SIGN, SPIKE, STATUE, STUMP, TABLE, TOWER, TREE, TREES, WALL
   }
 
-  public Obstacle(String name, ObstacleType skin, Position position) {
+  public Obstacles(String name, ObstacleType skin, Position position) {
     super(skin.toString(), position, Element.Kind.OBSTACLE);
     this.name = name;
   }
 
-  public Obstacle(Map<String, String> attributes) {
+  public Obstacles(Map<String, String> attributes) {
     super(attributes);
   }
 

@@ -1,4 +1,4 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.display;
 
 import java.nio.file.Path;
 import java.io.File;

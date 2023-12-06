@@ -1,6 +1,8 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.objects;
 
 import java.util.Map;
+
+import fr.uge.TheBigAventure.general.Position;
 
 public class Weapon extends Item {
   private final int damage;
