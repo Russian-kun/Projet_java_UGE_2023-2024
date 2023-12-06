@@ -1,32 +1,41 @@
 package fr.uge.TheBigAventure;
 
 import java.util.ArrayList;
+import java.util.Map;
 
-public class Player {
-  private final String name;
-  private final String skin;
-  private int[] position = { 0, 0 };
+public class Player extends Element {
   private int health;
+  private ArrayList<Item> inventory = new ArrayList<>();
 
-  private final ArrayList<Items> inventory = new ArrayList<Items>();
-
-  public Player(String nameString, String skinString, int x, int y, int playerHealth) {
-    this.name = nameString;
-    this.skin = skinString;
-    this.position[0] = x;
-    this.position[1] = y;
-    this.health = playerHealth;
+  // Constructeur
+  public Player(String name, String skin, Position position, int health) {
+    super(name, skin, position, Element.Kind.PLAYER);
+    this.health = health;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public String getSkin() {
-    return skin;
+  public Player(Map<String, String> attributes) {
+    super(attributes);
+    this.health = Integer.parseInt(attributes.get("health"));
   }
 
   public int getHealth() {
     return health;
   }
+
+  public void setHealth(int health) {
+    this.health = health;
+  }
+
+  public void addItem(Item item) {
+    inventory.add(item);
+  }
+
+  public void removeItem(Item item) {
+    inventory.remove(item);
+  }
+
+  public ArrayList<Item> getInventory() {
+    return inventory;
+  }
+
 }
