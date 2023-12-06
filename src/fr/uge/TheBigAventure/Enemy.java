@@ -32,10 +32,18 @@ class Enemy extends Element {
       throw new IllegalArgumentException("damage must be positive");
     if (health < 0)
       throw new IllegalArgumentException("health must be positive");
+
     this.name = name;
     this.health = health;
-    this.zone = zone;
-    this.behavior = Behavior.valueOf(behavior.toUpperCase());
+
+    if (zone == null)
+      zone = new Zone(position, 1, 1);
+    else
+      this.zone = zone;
+    if (behavior == null)
+      this.behavior = Behavior.STROLL;
+    else
+      this.behavior = Behavior.valueOf(behavior.toUpperCase());
     this.damage = damage;
   }
 
@@ -47,8 +55,16 @@ class Enemy extends Element {
       throw new IllegalArgumentException("damage must be positive");
     if (health < 0)
       throw new IllegalArgumentException("health must be positive");
-    this.zone = Zone.valueOf(attributes.get("zone"));
-    this.behavior = Behavior.valueOf(attributes.get("behavior").toUpperCase());
+
+    if (!(attributes.get("zone") == null))
+      this.zone = Zone.valueOf(attributes.get("zone"));
+    else
+      this.zone = new Zone(this.position, 1, 1);
+
+    if (!(attributes.get("behavior") == null))
+      this.behavior = Behavior.valueOf(attributes.get("behavior").toUpperCase());
+    else
+      this.behavior = Behavior.STROLL;
   }
 
   public String getName() {

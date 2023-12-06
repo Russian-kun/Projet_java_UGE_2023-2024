@@ -10,12 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class World {
-  private final int[][] arrayWorld;
-  private final int height;
-  private final int width;
-  private final HashMap<String, String> encodings = new HashMap<>();
-  private final ArrayList<Element> existingItems;
+public record World(int height, int width, String[][] map, Map<String, String> encodings,
+    ArrayList<Element> existingItems) {
 
   @Override
   public String toString() {
@@ -24,7 +20,7 @@ public class World {
     for (int i = 0; i < height; i++) {
       sb.append("[");
       for (int j = 0; j < width; j++) {
-        sb.append(arrayWorld[i][j]);
+        sb.append(map[i][j]);
         if (j != width - 1)
           sb.append(", ");
       }
@@ -33,14 +29,12 @@ public class World {
     return sb.toString();
   }
 
-  public World(int x, int y, Map<String, String> encodings, ArrayList<Element> itemList) {
+  public World
+
+  {
     Objects.requireNonNull(encodings);
-    Objects.requireNonNull(itemList);
-    arrayWorld = new int[x][y];
-    height = x;
-    width = y;
-    encodings.forEach((key, value) -> this.encodings.put(key, value));
-    existingItems = itemList;
+    Objects.requireNonNull(existingItems);
+    Objects.requireNonNull(map);
   }
 
   static private int[] readSize(Lexer lexer) throws IOException {
@@ -57,52 +51,46 @@ public class World {
   }
 
   private static Map<String, String> readEncoding(Lexer lexer) throws IOException {
-    String currentName = "", currentEncoding = "";
     HashMap<String, String> encodings = new HashMap<String, String>();
 
     Result result;
     while ((result = lexer.nextResult()) != null) {
-      currentName = result.content();
+      String currentName = result.content();
       if (result.token().name().equals("IDENTIFIER")) {
-        while ((result = lexer.nextResult()) != null &&
-            !result.token().name().equals("IDENTIFIER")) {
+        while ((result = lexer.nextResult()) != null && !result.token().name().equals("IDENTIFIER")) {
         }
-        currentEncoding = result.content();
-        var res = encodings.putIfAbsent(currentEncoding, currentName);
+        var res = encodings.putIfAbsent(result.content(), currentName);
         if (!(res == null)) {
-          throw new IOException("Encoding already exist : " + currentEncoding + " -> " + currentName);
+          throw new IOException("Encoding already exist : " + result.content() + " -> " + currentName);
         }
 
       } else if (result.token().name().equals("HEADER")) {
         break;
       }
     }
-
     return Map.copyOf(encodings);
   }
 
   public static String[][] readData(Lexer lexer) throws IOException {
     Result result;
-    int width = 0, height = 0;
-    // On cherche le debut de la map
     while ((result = lexer.nextResult()) != null && !result.token().name().equals("QUOTE")) {
     }
+    String[] split = result.content().split("\\n");
+    int width = split[1].strip().length(), height = split.length - 2;
 
-    var split = result.content().split("\\n");
-    height = split.length - 2;
-    width = split[1].strip().length();
     String[][] map = new String[height][width];
 
+    return extractData(split, width, height, map);
+  }
+
+  private static String[][] extractData(String[] split, int width, int height, String[][] map) throws IOException {
     for (int currHeight = 1; currHeight < height + 1; currHeight++) {
       String s = split[currHeight].strip();
-
       if (width != s.length())
         throw new IOException("Inconsistant map width");
-
-      String[] individualChars = s.split("");
       int currWidth = 0;
 
-      for (String tmp2 : individualChars) {
+      for (String tmp2 : s.split("")) {
         if (!tmp2.equals(" "))
           map[currHeight - 1][currWidth] = tmp2;
         currWidth++;
@@ -114,26 +102,29 @@ public class World {
   private static Element readElement(Lexer lexer) throws IOException {
     // player, item, enemy, obstacle, vehicle
     // Pour l'instant: player, item, obstacle, enemy
-    Result result;
     HashMap<String, String> attributes = new HashMap<String, String>();
+    addAttributes(lexer, attributes);
 
+    return determineElement(attributes);
+  }
+
+  private static void addAttributes(Lexer lexer, HashMap<String, String> attributes) throws IOException {
+    Result result;
     while ((result = lexer.nextResult()) != null) {
       if (!result.token().name().equals("IDENTIFIER"))
         break;
       String name = result.content();
       while ((result = lexer.nextResult()) != null && result.token().name().equals("COLON")) {
       }
-      String value = result.content();
-      if (value.equals(""))
+      if (result.content().equals(""))
         throw new IOException("Error while reading element");
-      attributes.put(name, value);
-
+      attributes.put(name, result.content());
     }
+  }
 
-    if (attributes.containsKey("player")) {
+  private static Element determineElement(HashMap<String, String> attributes) {
+    if (attributes.containsKey("player"))
       attributes.put("kind", "player");
-    }
-
     switch (attributes.get("kind")) {
       case "player":
         return new Player(attributes);
@@ -151,68 +142,37 @@ public class World {
   }
 
   public static World readMap(Path file) throws IOException {
-    int height = 0, width = 0;
-    HashMap<String, String> encodings = new HashMap<String, String>();
-    ArrayList<Element> existingItems = new ArrayList<Element>();
-
     Path path = Path.of("maps/").resolve(file);
     String text = Files.readString(path);
     Lexer lexer = new Lexer(text);
-    String[][] map = null;
     Result result;
 
+    int[] dimensions = { 0, 0 };
+    HashMap<String, String> encodings = new HashMap<String, String>();
+    ArrayList<Element> existingItems = new ArrayList<Element>();
+    String[][] map = null;
+
     while ((result = lexer.nextResult()) != null) {
-      System.out.println(result);
-      if (!result.token().name().equals("HEADER"))
-        continue;
       switch (result.content()) {
         case "size:":
-          int[] tmp;
-          try {
-            tmp = readSize(lexer);
-          } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("Error while reading size");
-          }
-          width = tmp[0];
-          height = tmp[1];
-
+          dimensions = readSize(lexer);
           break;
-
         case "encodings:":
-          try {
-            encodings.putAll(readEncoding(lexer));
-            lexer = new Lexer(text.substring(lexer.lastResult().start()));
-          } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("Error while reading encodings");
-          }
+          encodings.putAll(readEncoding(lexer));
+          lexer = new Lexer(text.substring(lexer.lastResult().start()));
           break;
-
         case "data:":
-          try {
-            map = readData(lexer);
-            if (map.length != height || map[0].length != width)
-              throw new IOException("Inconsistant map size");
-          } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("Error while reading map data");
-          }
+          map = readData(lexer);
+          if (map.length != dimensions[1] || map[0].length != dimensions[0])
+            throw new IOException("Inconsistant map size");
           break;
-
         case "[element]":
-          try {
-            Element tmp2 = readElement(lexer);
-            existingItems.add(tmp2);
-            lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
-          } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Error while reading map elements");
-          }
+          Element tmp2 = readElement(lexer);
+          existingItems.add(tmp2);
+          lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
           break;
       }
-
     }
-    return new World(height, width, encodings, existingItems);
+    return new World(dimensions[1], dimensions[0], map, encodings, existingItems);
   }
 }
