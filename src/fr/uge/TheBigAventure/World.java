@@ -11,13 +11,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class World {
-
   private final int[][] arrayWorld;
-  // private final int[] arrayPow = { 0, 0 };
   private final int height;
   private final int width;
   private final HashMap<String, String> encodings = new HashMap<>();
-  private final ArrayList<Items> existingItems;
+  private final ArrayList<Element> existingItems;
 
   @Override
   public String toString() {
@@ -35,7 +33,7 @@ public class World {
     return sb.toString();
   }
 
-  public World(int x, int y, Map<String, String> encodings, ArrayList<Items> itemList) {
+  public World(int x, int y, Map<String, String> encodings, ArrayList<Element> itemList) {
     Objects.requireNonNull(encodings);
     Objects.requireNonNull(itemList);
     arrayWorld = new int[x][y];
