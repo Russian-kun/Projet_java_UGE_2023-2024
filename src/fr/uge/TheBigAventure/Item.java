@@ -3,6 +3,7 @@ package fr.uge.TheBigAventure;
 import java.util.Map;
 
 public class Item extends Element {
+  private String name;
 
   // Class car les items ont des positions qui peuvent être modifiées
   public enum ItemSkins {
@@ -11,7 +12,8 @@ public class Item extends Element {
   }
 
   public Item(String name, ItemSkins skin, Position position) {
-    super(name, skin.toString(), position, Element.Kind.ITEM);
+    super(skin.toString(), position, Element.Kind.ITEM);
+    this.name = name;
   }
 
   public Item(Map<String, String> attributes) {

@@ -3,6 +3,7 @@ package fr.uge.TheBigAventure;
 import java.util.Map;
 
 class Obstacle extends Element {
+  private String name;
 
   public enum ObstacleType {
     BED, BOG, BOMB, BRICK, CHAIR, CLIFF, DOOR, FENCE, FORT, GATE, HEDGE, HOUSE, HUSK, HUSKS, LOCK, MONITOR, PIANO,
@@ -10,7 +11,8 @@ class Obstacle extends Element {
   }
 
   public Obstacle(String name, ObstacleType skin, Position position) {
-    super(name, skin.toString(), position, Element.Kind.OBSTACLE);
+    super(skin.toString(), position, Element.Kind.OBSTACLE);
+    this.name = name;
   }
 
   public Obstacle(Map<String, String> attributes) {

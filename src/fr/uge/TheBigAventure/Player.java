@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Player extends Element {
+  private String name;
   private int health;
   private ArrayList<Item> inventory = new ArrayList<>();
 
   // Constructeur
   public Player(String name, String skin, Position position, int health) {
-    super(name, skin, position, Element.Kind.PLAYER);
+    super(skin, position, Element.Kind.PLAYER);
     this.health = health;
+    this.name = name;
   }
 
   public Player(Map<String, String> attributes) {
