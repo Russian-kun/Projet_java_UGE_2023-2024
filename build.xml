@@ -5,7 +5,7 @@
     <property name="src.dir" value="src"/>
     <property name="maps.dir" value="maps"/>
     <property name="docs.dir" value="docs"/>
-    <property name="build.dir" value="build"/>
+    <property name="build.dir" value="."/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="lib.dir" value="lib"/>
     <property name="jar.dir" value="${build.dir}/jar"/>
@@ -45,7 +45,9 @@
 
     <!-- Tache pour nettoyer le projet -->
     <target name="clean">
-        <delete dir="${build.dir}"/>
+        <delete dir="${classes.dir}"/>
+        <delete dir="${jar.dir}"/>
+        <delete dir="${docs.dir}"/>
     </target>
 
 </project>
