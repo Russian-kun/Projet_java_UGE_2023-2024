@@ -1,21 +1,36 @@
 package fr.uge.main;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import fr.uge.lexer.Lexer;
-import fr.uge.lexer.Result;
+import fr.uge.TheBigAventure.Affichage;
+import fr.uge.TheBigAventure.World;
+import java.nio.file.Path;
+import java.awt.Color;
+import fr.umlv.zen5.*;
 
 public class Main {
   public static void main(String[] args) throws IOException {
-    var path = Path.of("maps/demo1.map");
-    var text = Files.readString(path);
-    var lexer = new Lexer(text);
-    Result result;
-    while ((result = lexer.nextResult()) != null) {
-      System.out.println(result);
-    }
+    Application.run(Color.BLACK, context -> {
+      try {
+        World world = World.readMap(Path.of("monster_house.map"));
+
+        Affichage affichage = new Affichage(world, context);
+
+        // On redimensionne les images
+        context.renderFrame(graphics -> {
+          graphics.setColor(Color.WHITE);
+          affichage.draw(graphics);
+        });
+        context.pollOrWaitEvent(5 * 1000);
+        context.exit(0);
+        System.out.println(world);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      // context.renderFrame(graphics -> {
+      // world.draw(graphics);
+      // });
+    });
   }
 
 }

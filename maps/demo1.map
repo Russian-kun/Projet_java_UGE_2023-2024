@@ -1,9 +1,12 @@
 size: (6 x 5)
-encodings: WALL (W) BRICK (B) FENCE (F)
+encodings: WALL (W) BRICK (B) 
+FENCE ( F ) WATER (
+   G
+   )
 
 data: """
    WWWWWW
-   W    W
+   W GG W
    W FF W
    B    B
    BB BBB

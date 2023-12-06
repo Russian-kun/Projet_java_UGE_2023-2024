@@ -1,0 +1,730 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:umlv="http://www.umlv.fr/2005/tipi" lang="fr" xml:lang="fr"
+  class=" xgnewexr idc0_349">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>The Big Adventure</title><link rel="stylesheet" type="text/css"
+      href="The%20Big%20Adventure_fichiers/stylesheet.css" media="screen"><link
+      rel="stylesheet" type="text/css"
+      href="The%20Big%20Adventure_fichiers/printstylesheet.css" media="print"><link
+      rel="stylesheet" type="text/css"
+      href="The%20Big%20Adventure_fichiers/sh_ide-eclipse.css"><script
+      type="text/javascript">
+	      if(document.location.href.indexOf('http://igm/',0)!=-1){
+	              document.location.href=document.location.href.replace(/.univ-mlv.fr/,'').replace(/http:\/\/(igm|www-igm)/,'http://igm.univ-mlv.fr');
+		      }
+	      if(document.location.href.indexOf('http://www-igm/',0)!=-1){
+		                            document.location.href=document.location.href.replace(/.univ-mlv.fr/,'').replace(/http:\/\/(igm|www-igm)/,'http://igm.univ-mlv.fr');
+					                          }
+		function viewPDF(){
+			window.print();
+		}
+			
+		function myswitch(){
+		if(document.location.href.indexOf('index')>-1){
+			document.location.href= document.location.href.replace(/ens/,'ens/private').replace('http://','https://');
+		}else{
+		document.location.href= document.location.href.replace(/ens/,'ens/private').replace(/.php/,'_cor.php').replace('http://','https://');
+		}	
+		}
+	</script><style class="__chameleon_filtered_exfil"></style><link
+      href="data:text/css,%3Ais(%5Bid*%3D'google_ads_iframe'%5D%2C%5Bid*%3D'taboola-'%5D%2C.taboolaHeight%2C.taboola-placeholder%2C%23credential_picker_container%2C%23credentials-picker-container%2C%23credential_picker_iframe%2C%5Bid*%3D'google-one-tap-iframe'%5D%2C%23google-one-tap-popup-container%2C.google-one-tap-modal-div%2C%23amp_floatingAdDiv%2C%23ez-content-blocker-container)%20%7Bdisplay%3Anone!important%3Bmin-height%3A0!important%3Bheight%3A0!important%3B%7D"
+      rel="stylesheet" type="text/css"><style type="text/css">* {<br>        -webkit-user-select: text !important;<br>        -moz-user-select: text !important;<br>        -ms-user-select: text !important;<br>         user-select: text !important;<br>    }</style></head><body><div
+      class="conteneur"><div class="contenu"><span style="float:right;"
+          class="noprint"><div class="noprint"><table><tbody><tr><td><a
+                      href="javascript:myswitch();" style="text-decoration:none"><img
+                        src="The%20Big%20Adventure_fichiers/lock_icon.gif"
+                        class="noprint" align="middle"></a></td></tr></tbody></table></div></span><span
+          style="text-align:left;"><a>::</a><a
+            href="https://monge.univ-mlv.fr/ens/index.php"> Enseignements </a>::<a
+            href="https://monge.univ-mlv.fr/ens/Licence/index.php"> Licence </a>::<a
+            href="https://monge.univ-mlv.fr/ens/Licence/L3/index.php"> L3 </a>::<a
+            href="https://monge.univ-mlv.fr/ens/Licence/L3/2023-2024/index.php">
+            2023-2024 </a>::<a
+            href="https://monge.univ-mlv.fr/ens/Licence/L3/2023-2024/Java/index.php">
+            Programmation Objet avec Java </a>::</span><hr noshade="noshade"
+          size="1"><table><tbody><tr><td valign="middle"><img class="print"
+                  src="The%20Big%20Adventure_fichiers/mlv.png" alt="[LOGO]"></td><td
+                style="vertical-align : middle;"><h1>The Big Adventure</h1></td></tr></tbody></table><hr>
+
+        <h2 xmlns>Objectif général</h2>
+        <div xmlns>
+          Le but de ce projet de jouer à un jeu d'aventure et/ou de fabriquer
+          les mondes du jeu d'aventure.
+          <br>
+          Il s'agit d'un meta-jeu, où l'on peut prendre autant de plaisir à
+          jouer que de plaisir à créer les mondes du jeu.
+          En terme d'expérience de jeu, on veut se rapprocher d'un mode de jeu à
+          la zelda moderne (Breath of the Wild)
+          pas dans son histoire/scénario, mais dans la capacité à créer sa
+          propre histoire.
+        </div>
+        <br xmlns>
+
+        <h2 xmlns>Condition de rendu</h2>
+        <div xmlns>
+          Ce projet est à faire par binôme (2 personnes, ni 1 ni 3) et doit être
+          déposé au plus tard le 19 janvier 2024 à 23h59 sur e-learning.
+        </div>
+        <br xmlns>
+        <div xmlns>
+          Une soutenance « bêta » aura lieu la semaine du 11 décembre (la date
+          et l'horaire vous seront précisés).
+          Votre travail ne sera pas noté, mais vous devrez tenir compte des
+          remarques pour améliorer votre projet
+          jusqu'au rendu final.
+        </div>
+        <br xmlns>
+
+        <h2 xmlns>Cahier des charges</h2>
+        Un niveau du jeu consiste en une carte (map) définie sous forme de
+        grille (grid) contenant des obstacles et
+        éléments décoratifs fixes ainsi que des éléments amis/ennemies, des
+        éléments d'inventaires
+        (dont font parties les éléments nutritifs).
+        <ol xmlns>
+          <li>
+            <b>Les éléments décoratifs</b>
+            <div>
+              Les ALGAE, CLOUD, FLOWER, FOLIAGE, GRASS, LADDER, LILY,
+              PLANK, REED, ROAD, SPROUT, TILE, TRACK, VINE sont les élements
+              décoratifs de la carte
+              sur lesquels les personnages peuvent marcher.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments obstacles</b>
+            <div>
+              Les BED, BOG, BOMB, BRICK, CHAIR, CLIFF, DOOR, FENCE,
+              FORT, GATE, HEDGE, HOUSE, HUSK, HUSKS,
+              LOCK, MONITOR, PIANO, PILLAR, PIPE, ROCK, RUBBLE,
+              SHELL, SIGN, SPIKE, STATUE, STUMP, TABLE, TOWER,
+              TREE, TREES, WALL sont les élements qui peuvent servir
+              d'obstacle pour éviter qu'un joueur accède à une partie de la
+              carte.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments intermittents</b>
+            <div>
+              Les BUBBLE ou DUST apparaissent lorsque l'on rentre dans une zone
+              déterminée de la carte
+              pour attirer le regard du joueur sur un endroit précis de la
+              carte.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments amis ou ennemis</b>
+            <div>
+              Les BABA, BADBAD, BAT, BEE, BIRD, BUG, BUNNY, CAT, CRAB, DOG,
+              FISH, FOFO, FROG,
+              GHOST, IT, JELLY, JIJI, KEKE, LIZARD, ME, MONSTER, ROBOT, SNAIL,
+              SKULL,
+              TEETH, TURTLE, WORM sont soit des amis, soit des ennemis.
+              Ils peuvent parler avec un joueur, échanger des éléments de l'inventaire,
+              voler des éléments de l'inventaire, faire des dégats au joueur et
+              se transformer en fantôme.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments d'inventaire</b>
+            <div>
+              Les BOOK, BOLT, BOX, CASH, CLOCK, COG, CRYSTAL, CUP, DRUM, FLAG,
+              GEM, GUITAR,
+              HIHAT, KEY, LAMP, LEAF, MIRROR, MOON, ORB, PANTS, PAPER, PLANET,
+              RING, ROSE, SAX, SCISSORS, SEED, SHIRT, SHOVEL, STAR, STICK, SUN,
+              SWORD,
+              TRUMPET, VASE sont les éléments de l'inventaire.
+              Ils peuvent être échangés avec les amis.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments nutritifs</b>
+            <div>
+              Les BANANA, BOBA, BOTTLE, BURGER, CAKE, CHEESE, DONUT, DRINK, EGG,
+              FRUIT,
+              FUNGUS, FUNGI, LOVE, PIZZA, POTATO, PUMPKIN, TURNIP peuvent être
+              mangés
+              pour regagner de la santé.
+              De plus les, BUNNY, CRAB, FISH, FROG et SNAIL peuvent être mangés
+              s'ils sont cuits.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Personnages</b>
+            <div>
+              Ce sont les personnages que le joueur peut choisir en début de jeu
+              : BABA, BADBAD, FOFO, IT.
+              Il n'y a pas de différence entre eux, ce sont juste différents
+              "skins".
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments de transports</b>
+            <div>
+              PLANE/ROCKET/UFO (CLOUD), CAR (ROAD), TRAIN + CART (TRACK), BOAT
+              (WATER) sont des éléments sur lequel le joueur
+              peut monter pour être transporté d'un endroit de la carte à l'autre.
+              Les PLANES/ROCKET/UFO, CAR et TRAIN se déplacent en suivant
+              respectivement les CLOUD, ROAD et TRACK.
+              Si le joueur se place devant un élément de transport, il se fait
+              écraser. Si un joueur
+              attend en haut ou en bas si la pîste est horizontale (et à gauche
+              ou à droite si la piste est verticale),
+              le moyen de transport s'arrête devant le joueur et le joueur peut
+              monter dessus (dans le cas du train,
+              on ne peut monter que sur les wagons). Un PLANE/ROCKET/UFO se
+              déplace 2 fois plus vite qu'un joueur, un TRAIN
+              se déplace 1.75 plus vite qu'un joueur et un CAR se déplace 1.5
+              plus vite qu'un joueur, un BOAT se
+              déplace aussi vite qu'un joueur.
+              Pour sortir du PLANE/ROCKET/UFO, TRAIN, CAR, BOAT le joueur
+              utilise les flèches de déplacement.
+              Par défaut, le PLANE/ROCKET/UFO, TRAIN, CAR suit sa piste, arrivé
+              en bout de piste
+              (si la piste n'est pas circulaire), il fait demi-tour (à vous de
+              gérer correctement le demi-tour du TRAIN).
+              Un BOAT reste à son emplacement initial et c'est le joueur qui le
+              déplace.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments d'armes</b>
+            <div>
+              Il existe plusieurs armes. Une fois récupérés soit en passant
+              dessus, soit en l'échangeant, une arme
+              permet de causer des dégats sur les ennemies (elle ne fait rien
+              sur les amis, c'est un jeu pour enfant !).
+              <ul>
+                <li>STICK, SHOVEL, SWORD: inflige des dégats aux ennemis qui se
+                  trouvent devant le joueur
+                  (en fonction de la direction du personnage).
+                  Le STICK et SWORD peut être enflammé s'il touche le feu (FIRE,
+                  LAVA). Dans ce cas, il reste
+                  enflammé tant qu'il ne touche pas de l'eau (WATER). Un
+                  STICK/SWORD enflammé permet de faire
+                  plus de dégat, de faire fondre la glace (ICE) et de cuire les
+                  éléments que l'on peut cuire
+                  (pour les manger).
+                  Une épée (SWORD) permet aussi de couper du bois (si elle n'est
+                  pas enflammé),
+                  en transformant les TREE/TREES en BOX.
+                  Une pelle (SHOVEL) peut aussi planter une graine (SEED) dans l'herbe
+                  (GRASS).
+                </li>
+                <li>BOLT(arme): lancer des éclairs (qui se propage en fonction
+                  de la direction du personnage),
+                  tues les ennemis, met le feu aux arbres</li>
+              </ul>
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les élements pour passer d'une map à l'autre</b>
+            <div>
+              Les DOOR, GATE, HOUSE, TOWER si elles sont ouvertes (avec des KEY,
+              LEVER) représentent des passages
+              pour aller d'une map à une autre. Par exemple, pour qu'un joueur
+              puisse aller dans une maison
+              pour rencontrer un ami.
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments de biome</b>
+            <div>
+              Les éléments ICE, LAVA, WATER sont des éléments qui sont hostiles
+              au joueur, celui-ci ne peut pas
+              se déplacer dessus. Mais ICE peut être fondu par le feu, et WATER
+              peut être traversé en utilisant
+              soit une BOX, soit un BOAT. Une BOX dérive en fonction du courant
+              tandis qu'un BOAT est contrôlé
+              par le joueur (s'il est dessus).
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments spéciaux</b>
+            <ul>
+              <li>BOOK, PAPER: explique le lore/folklore de votre jeu</li>
+              <li>BOX: flotte sur l'eau, est créé à partir d'un arbre, bouge
+                avec le courant</li>
+              <li>BUCKET: prendre de l'eau, éteindre le feu, pour faire pousser
+                un SPROUT</li>
+              <li>FIRE: brule les éléments, se propage doucement, cuit les
+                BUNNY|CRAB|FISH|FROG|SNAIL</li>
+              <li>GHOST: passe à travers les murs (BED, BRICK, DOOR, FENCE,
+                GATE, PILLAR, PIPE, STATUE, TABLE, WALL)</li>
+              <li>KEY, LEVER: ouvre les portes, maisons, gates, locks, tours</li>
+              <li>MIRROR: transforme les personnages fantômes en vrai personnage</li>
+              <li>SEED: planter avec une SHOVEL, se transform en SPROUT</li>
+              <li>SPROUT: se transform en arbre (TREE) si arroser avec un BUCKET
+                plein d'eau.</li>
+              <li>WIND: pousse le personnage dans la direction du vent (avec la
+                propriété flow)</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h2 xmlns>Les cartes</h2>
+        Les cartes sont des grilles sur lesquelles le joueur peut se déplacer.
+        Une carte est définie pas un fichier ".map" qui contient une description
+        textuelle d'une carte.
+        Le format d'une carte contient plusieurs sections décrivant, la grille
+        de la carte,
+
+        <ul xmlns>
+          <li>
+            <b>La grille de la carte</b>
+            <div>
+              La grille est définie par une section <tt>[grid]</tt> qui définie
+              <ul>
+                <li>
+                  <tt>size</tt>: la taille de la grille width x height. Par
+                  exemple,
+                  <pre width="100%">                           size: (6 x 5)
+                       </pre>
+                </li>
+                <li>
+                  <tt>encodings</tt>: l'encodage de chaque élément sous forme
+                  nom de l'élement puis l'encodage
+                  de l'élément sous forme d'un seul caractère entre parenthèse.
+                  Par exemple,
+                  <pre width="100%">                           encodings: WALL(W) BRICK(B)
+                                      FENCE(F)
+                       </pre>
+                </li>
+                <li>
+                  <tt>data</tt>: un text commençant par """ se finissant par """
+                  utilisant l'encodage défini
+                  dans <tt>encodings</tt>. Par exemple,
+                  <pre width="100%">                           data: """
+                           WWWWWW
+                           W    W
+                           W FF W
+                           B    B
+                           BBBBBB
+                           """
+                       </pre>
+                  Comme en Java/Python, les espaces à gauche du deuxième """ ne
+                  doivent pas être pris en compte.
+                </li>
+              </ul>
+            </div>
+            <br>
+          </li>
+          <li>
+            <b>Les éléments de la carte</b>
+            <div>
+              Les éléments de la carte sont définie par la section <tt>[element]</tt>
+              qui définie
+              des sous-sections <tt>[element]</tt> qui définissent les éléments.
+              Par exemple, le joueur est défine comme ceci
+              <pre width="100%">                  [element]
+                    name: John
+                    player: true
+                    skin: BABA
+                    position: (1,1)
+                    health: 10
+              </pre>
+              une épée qui traine et qui peut être ramassée par un joueur est
+              définie comme cela,
+              <pre width="100%">                  [element]
+                    name: Durendale
+                    skin: SWORD
+                    position: (3,1)
+                    kind: item
+                    damage: 15
+              </pre>
+              le courant d'une rivière est défini comme cela,
+              <pre width="100%">                  [element]
+                    skin: WATER
+                    zone: (10, 10) (5 x 5)
+                    flow: NORTH
+              </pre>
+              et un ennemi est défini comme cela
+              <pre width="100%">                  [element]
+                    name: Waldo
+                    skin: CRAB
+                    position: (1, 3)
+                    kind: enemy
+                    health: 10
+                    zone: (1, 1) (5 x 3)
+                    behavior: agressive
+                    damage: 10
+              </pre>
+              Voilà les attributs possibles
+              <ul>
+                <li>
+                  <tt>name</tt>: nom de l'élément (optionnel)</li>
+                <li>
+                  <tt>skin</tt>: apparence (BOOK, STICK, BUNNY, etc)</li>
+                <li>
+                  <tt>player</tt>: true | false, il devrait y avoir qu'un seul
+                  player</li>
+                <li>
+                  <tt>position</tt>: position de départ sur la carte, le 0, 0
+                  est le coin en haut à gauche</li>
+                <li>
+                  <tt>health</tt>: point de vie, un entier positif</li>
+                <li>
+                  <tt>kind</tt>: type d'élément parmi friend, enemy, item,
+                  obstacle</li>
+                <li>
+                  <tt>zone</tt>: zone définie par une coordonnée et une longueur
+                  et une hauteur dans laquelle se balade l'élément</li>
+                <li>
+                  <tt>behavior</tt>: comportement de l'élément parmi shy, stroll
+                  et agressive</li>
+                <li>
+                  <tt>damage</tt>: dégat infligé à chaque attaque, un entier
+                  positif</li>
+                <li>
+                  <tt>text</tt>: un text associé au même format que data dans
+                  grid, pour les BOOK ou ce que dise les personnages</li>
+                <li>
+                  <tt>steal</tt>: une liste de skin d'élément que sont volés de
+                  l'inventaire s'il y a contact avec le joueur</li>
+                <li>
+                  <tt>trade</tt>: une liste de pair skin et nom d'un élément
+                  (skin -&gt; skin name) qui sont échangeables.
+                  <br>
+                  Par exemple,
+                  <pre width="100%">                          trade: CASH -&gt; KEY red, CASH -&gt; PIZZA
+                      </pre>
+                  qui veut dire que l'on peut échanger du cash
+                  contre la clé rouge (qui doit être définie comme élément sans
+                  position)
+                  ou du cash pour une pizza.
+                </li>
+                <li>
+                  <tt>locked</tt>: indique comment débloquer l'élément en
+                  indiquant un KEY|LEVER et son nom, par exemple
+                  <pre width="100%">                       locked: KEY red
+                   </pre>
+                </li>
+                <li>
+                  <tt>flow</tt>: indique le sens du courant pour les éléments
+                  ayant la bonne skin dans la zone,
+                  les valeurs possibles sont NORTH, SOUTH, EAST and WEST. Si on
+                  veut un flow, NORTH EAST, on peut
+                  définir deux éléments sur la même zone.
+                </li>
+                <li>
+                  <tt>phantomized</tt>: true | false, transforme le personnage
+                  qui entre en contact en GHOST.
+                </li>
+                <li>
+                  <tt>teleport</tt>: nom du fichier .map si lorsque l'on passe à
+                  travers certain DOOR, GATE, HOUSE ou TOWER,
+                  on se téléporte sur une autre carte. De plus, il existe une
+                  valeur spéciale "BACK" qui indique
+                  que l'on se téléporte sur la map dont l'on venait (pour
+                  revenir après avoir visité
+                  par exemple une maison).
+                </li>
+              </ul>
+            </div>
+            <br>
+          </li>
+        </ul>
+
+        <h2 xmlns>L'esprit du jeu</h2>
+        On souhaite créer un jeu où
+        <ul xmlns>
+          <li>
+            On n'explique pas, on montre
+            <br>
+            <a href="https://en.wikipedia.org/wiki/Show%2C_don't_tell">https://en.wikipedia.org/wiki/Show%2C_don't_tell</a>
+            <br>
+            Par exemple, moins vous avez de texte mieux c'est !
+          </li>
+          <li>
+            C'est un <a href="https://en.wikipedia.org/wiki/Open_world">open
+              world</a>, on doit pas se sentir enfermer par des murs ...
+          </li>
+          <li>
+            Le jeu doit être immersif : l'interface graphique ne montre que la
+            carte, pas de minimap, pas d'UI en plus
+          </li>
+          <li>
+            Les personnages du jeu ont un nom affiché en dessous d'eux.
+            <br>
+            le fait que Jean Claude se fasse tuer a plus d'impact que si c'est
+            juste un crabe.
+          </li>
+          <li>
+            Le joueur ne doit pas être bloqué, l'objectif à atteindre doit
+            toujours rester clair.
+            <br>
+            Vous pouvez utiliser le <a
+              href="https://en.wikipedia.org/wiki/Foreshadowing">Foreshadowing</a>
+            et les éléments intermittents pour vous aider.
+          </li>
+          <li>
+            L'action faite par la barre d'espace doit être évident pour le
+            joueur.
+          </li>
+          <li>
+            Le joueur doit combiner des choses pour atteindre le but. Il doit se
+            sentir intelligent.
+            <br>
+            Aller regarder cette video: <a
+              href="https://www.youtube.com/watch?v=OUhOqTEzIxQ">Comment Zelda a
+              révolutionné le jeu vidéo en openworld ?</a>.
+            Je veux la même chose :) mais en 2D.
+          </li>
+        </ul>
+
+        <h2 xmlns>Les différentes phases de développement</h2>
+        Le projet a quatre phases de développement : phase0, phase1, phase2 et
+        phase3.
+        <ol xmlns>
+          <li>
+            <tt>phase0</tt>: c'est la phase que vous devez finir pour ne pas
+            avoir 0.
+            Le jeu doit être capable d'afficher une map avec des éléments
+            décoratifs, des obstacles,
+            des ennemis, une épée (donc pas de vrai inventaire). L'affichage n'a
+            pas besoin de scroller avec
+            le joueur. Le système de point de vie doit fonctionner (sans la
+            notion de nourriture).
+            Les ennemis ont juste le comportement stroll.
+          </li>
+          <li>
+            <tt>phase1</tt>: on doit avoir des amis avec qui on peut parler et
+            échanger des objets, donc
+            l'inventaire doit fonctionner. La notion de portes et de clés doit
+            fonctionner. Le système de
+            point de vie doit ajouter la notion de nourriture. La carte doit
+            être centrée sur le joueur
+            et scroller lorsque l'on se déplace (sauf dans les coins).
+            Les armes STICK et SWORD doivent fonctionner.
+          </li>
+          <li>
+            <tt>phase2</tt>: on doit avoir le feu qui se propage, les
+            trains/voitures/avions/bateau/boite qui fonctionnent,
+            le courant de l'eau qui marche. On doit de plus être capable de
+            planter des choses et de les faire grandir.
+            Les armes SHOVEL, BOLT et stick/sword enflammés doivent fonctionner.
+          </li>
+          <li>
+            <tt>phase3</tt>: les mécaniques restantes où celles que vous voulez
+            ajouter si jamais
+            la mécanique a été validé par un enseignant sur le forum discord du
+            projet.
+            Toute amélioration non validée va être considérée comme un
+            non-respect du cahier des charges
+            et le projet sera noté zéro.
+          </li>
+        </ol>
+        Attention, en termes de notation si tous les mécanismes d'une phase ne
+        sont pas implantés, nous ne tiendrons pas
+        compte des mécanismes des phases supérieurs. Vous devez implanter TOUS
+        les mécanismes d'une phase avant de passer
+        à la suivante. Et oui, cela veut dire que vous aurez zéro par exemple,
+        si les portes marchent avec les clés, mais
+        on peut passer à travers les obstacles.
+
+        <h2 xmlns>Le programme</h2>
+        <ul xmlns>
+          <li>
+            <b>Commande</b>
+            <br>
+            Il est possible de paramétrer le jeu en ligne de commande à l'aide
+            des options suivantes :
+            <ul>
+              <li>--level name.map: nom du fichier contenant la map à afficher
+                (obligatoire);</li>
+              <li>--validate: permet de valider qu'une carte est correcte sans
+                jouer au jeu</li>
+              <li>--dry-run: permet de se balader sur la carte sans que les
+                ennemis/amis ne bougent</li>
+              <li>--add-elements name.map: permet d'ajouter des
+                comportements supplémentaires (dans ce cas, la partie grid de la
+                map est
+                ignorée),
+                si on a deux valeurs possibles pour une propriété d'un
+                élément, la valeur de la map spécifiée est prioritaire sur la
+                valeur du
+                level.</li>
+            </ul>
+          </li>
+          <li>
+            <b>Pour jouer</b>
+            <br>
+            Le jeu se joue au clavier, avec les touches de direction (haut, bas,
+            gauche, droite) pour se diriger.
+            La barre d'espace sert à faire l'action courante qui dépend de l'arme
+            que vous avez en main et l'élément
+            devant le personnage. La touche 'i' permet d'afficher l'inventaire.
+            On utilise les touches de direction
+            pour sélectionner ce que l'on veut dans l'inventaire. On valide avec
+            espace.
+          </li>
+          <li>
+            <b>Cartes fournies</b>
+            <br>
+            Le jeu doit venir avec deux cartes prédéfinies, <tt>demo.map</tt>
+            qui montre toutes
+            les mécaniques du jeu sur une petite carte et <tt>adventure.map</tt>
+            qui est la vraie grande aventure
+            du jeu.
+          </li>
+          <li>
+            <b>Validation des cartes</b>
+            <br>
+            Comme les cartes sont éditables facilement, il y a de bonnes chances
+            que vous et vos utilisateurs fassiez
+            des erreurs en écrivant la carte. Votre programme doit donc valider
+            les cartes en indiquant toutes les erreurs
+            (pas la première) AVANT de démarrer le jeu (et cela vaut aussi pour
+            les cartes où l'on arrive par téléportation).
+            Les messages d'erreurs doivent indiquer précisément le problème
+            (avec un message en anglais) ainsi que la ligne
+            ayant causé le problème. Attention, c'est une partie importante du
+            projet, faite en sorte de bien gérér tous
+            les cas d'erreur possible (sans que le code soit affreux SVP).
+          </li>
+          <li>
+            <b>Affichage</b>
+            <br>
+            Pour l'affichage, on vous demande d'utiliser la bibliothèque
+            <a
+              href="https://monge.univ-mlv.fr/ens/Licence/L3/2023-2024/Java/src/project/zen5.tar.gz">Zen
+              5</a>.
+            <br>
+            Attention à bien appeler la méthode <tt>render</tt> une seule fois
+            par frame du jeu, pas plus sinon votre jeu
+            va se transformer en sapin de noël (c'est la saison, c'est beau
+            aussi, mais ça fait mal à la tête).
+            <br>
+            Pour les tuiles, nous allons utiliser celle du jeu "Baba is You",
+            <a href="https://babaiswiki.fandom.com/wiki/Category:Nouns">https://babaiswiki.fandom.com/wiki/Category:Nouns</a>.
+          </li>
+        </ul>
+
+        <h2 xmlns>Références</h2>
+        <a xmlns href="https://ant.apache.org/manual/index.html">Ant Manual</a>
+        pour le fichier <tt xmlns>build.xml</tt>.
+        <br xmlns>
+        <a xmlns
+          href="https://stackoverflow.com/questions/5258159/how-to-make-an-executable-jar-file">How
+          to create an executable jar ?</a>.
+        <br xmlns>
+        <a xmlns
+          href="https://docs.oracle.com/en/java/javase/21/docs/api/index.html">JavaDoc</a>.
+        <br xmlns>
+        <a xmlns
+          href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/package-summary.html">Les
+          entrées/sorties sur fichier</a>.
+
+        <h2 xmlns>Conditions de rendu</h2>
+        <div xmlns>
+          Le projet est à rendre au plus tard le 19 janvier 2024.
+          Le format de rendu est une archive au format zip (<b>tout rar, tar.gz,
+            7z et autre
+            ne sera pas ouvert</b>) contenant :
+        </div>
+        <br xmlns>
+
+        <ul xmlns>
+          <li>un répertoire <tt>src</tt> contenant les sources du projet ;</li>
+          <li>un répertoire <tt>maps</tt> contenant les deux maps: demo.map et
+            adventure.map ;</li>
+          <li>un répertoire <tt>docs</tt> contenant le manuel de l'utilisateur
+            (<tt>user.pdf</tt>) et le manuel qui explique votre architecture
+            (<tt>dev.pdf</tt>) au format <b>PDF</b> avec une <b>section dédiée</b>
+            aux améliorations/corrections
+            apportées depuis la soutenance bêta ;</li>
+          <li>un répertoire <tt>classes</tt> <b>vide</b> dans l'archive et qui
+            contiendra les classes <b>une fois compilées</b> ;</li>
+          <li>un répertoire <tt>lib</tt> contenant les libraries dont dépend l'application
+            ;</li>
+          <li>un jar exécutable <tt>thebigadventure.jar</tt> qui fonctionne avec
+            <tt>java
+              -jar thebigadventure.jar</tt> et donc qui possède un fichier
+            manifest adéquat ;</li>
+          <li>un fichier <tt>build.xml</tt> (écrit à la main) qui permet de :
+            <ul>
+              <li>compiler les sources (target compile) ;</li>
+              <li>créer le jar exécutable (target jar) ;</li>
+              <li>générer la javadoc dans <tt>docs/api</tt> (target javadoc) ;</li>
+              <li>nettoyer le projet pour qu'il ne reste plus que les éléments
+                demandés (target clean).</li>
+            </ul>
+            La target par défaut doit créer le jar.
+            <br>
+            Pour vous aidez, <a href="https://ant.apache.org/manual/index.html">il
+              y a le manuel de Ant</a>
+          </li>
+        </ul>
+
+        <div xmlns>
+          Cette archive Zip (attention à l'encodage) aura comme nom <tt>Nom1_Nom2_TheBigAdventure.zip</tt>,
+          où les noms sont ceux des membres du binôme par ordre alphabétique.
+          L'extraction de cette archive devra créer un répertoire
+          de nom <tt>Nom1_Nom2_TheBigAdventure</tt> contenant tous les éléments
+          demandés ci-dessus.
+        </div>
+        <br xmlns>
+
+        <h2 xmlns>Notation</h2>
+        <ul xmlns>
+          <li>Cas de 0 sans aucune correction (mort subite) :
+            <ul>
+              <li>projet <b>non effectué en binôme</b> (c'est-à-dire 2 personnes
+                !) sans l'accord préalable de l'intervenant de TD ;</li>
+              <li>absence à la soutenance bêta ;</li>
+              <li>projet envoyé après la date ;</li>
+              <li>projet non déposé sur elearning ;</li>
+              <li>une archive qui n'a pas le bon nom ;</li>
+              <li>fichier d'archive dont l'extraction ne produit pas un
+                répertoire qui a le bon nom ;</li>
+              <li>le projet utilise une ou des librairies externes autres que
+                celles indiquées dans le sujet ;</li>
+              <li>présence de code copié / collé du net ;</li>
+              <li>l'utilisation de classes de <tt>java.io</tt> autre que <tt>InputStream</tt>/<tt>OutputStream</tt>,
+                <tt>Reader</tt>/<tt>Writer</tt>
+                et l'exception <tt>IOException</tt> ;</li>
+              <li>l'absence des fichiers user.pdf (doc utilisateur) et dev.pdf
+                (doc de développement).</li>
+              <li>l'absence de javadoc, ou javadoc pas en anglais.</li>
+            </ul>
+          </li>
+          <li>Critères de notation :
+            <ul>
+              <li>Rémi Forax Junior (11 ans) doit pouvoir jouer à votre jeu ;</li>
+              <li>la propreté et la lisibilité du code auront un poids très
+                important dans la note ;</li>
+              <li>l'architecture que vous aurez définie (interfaces, classes
+                ...) devra être donnée dans les documents
+                PDF et aura également un poids très important dans la note ;</li>
+              <li>pas de méthodes de plus de 20 lignes ! ;</li>
+              <li>pas de duplication de code, et respect des principes de
+                programmation objet ;</li>
+              <li>pas de variable globale;</li>
+              <li>pas de code inutile ;</li>
+              <li>présence des différents rapports et, par conséquent,
+                orthographe correcte !</li>
+              <li>prise en considération des remarques faites lors de la bêta
+                pour le rendu final.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <hr noshade="noshade" size="1"><span style="float:right;"
+          class="noprint"><div class="noprint"></div></span><div align="center"
+          class="copyright">© Université de Marne-la-Vallée</div></div></div>
+    <script src="The%20Big%20Adventure_fichiers/app.js" type="text/javascript"></script>
+  </body>
+</html>

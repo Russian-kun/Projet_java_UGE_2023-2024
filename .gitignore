@@ -1,4 +1,6 @@
 .vscode
 
 *.class
-./bin
+bin
+classes
+images/webp_to_gif.py
