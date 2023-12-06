@@ -18,4 +18,8 @@ class Obstacle extends Element {
   public Obstacle(Map<String, String> attributes) {
     super(attributes);
   }
+
+  public String getName() {
+    return name;
+  }
 }

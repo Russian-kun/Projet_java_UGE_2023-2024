@@ -18,4 +18,21 @@ class Zone {
     String[] dim = tot[1].replaceAll("[\\(\\) ]", "").split("x");
     return new Zone(new Position(tot[0]), Integer.parseInt(dim[0]), Integer.parseInt(dim[1]));
   }
+
+  public Position getTopLeft() {
+    return topLeft;
+  }
+
+  public int getWidth() {
+    return width;
+  }
+
+  public int getHeight() {
+    return height;
+  }
+
+  public boolean contains(Position position) {
+    return position.getX() >= topLeft.getX() && position.getX() < topLeft.getX() + width
+        && position.getY() >= topLeft.getY() && position.getY() < topLeft.getY() + height;
+  }
 }

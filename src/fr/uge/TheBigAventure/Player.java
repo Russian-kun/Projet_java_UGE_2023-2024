@@ -24,6 +24,10 @@ public class Player extends Element {
       throw new IllegalArgumentException("health must be positive");
   }
 
+  public String getName() {
+    return name;
+  }
+
   public int getHealth() {
     return health;
   }

@@ -20,4 +20,8 @@ public class Item extends Element {
     super(attributes);
   }
 
+  public String getName() {
+    return name;
+  }
+
 }

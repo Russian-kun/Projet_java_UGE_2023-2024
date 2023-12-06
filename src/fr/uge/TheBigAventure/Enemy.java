@@ -50,4 +50,20 @@ class Enemy extends Element {
     this.zone = Zone.valueOf(attributes.get("zone"));
     this.behavior = Behavior.valueOf(attributes.get("behavior").toUpperCase());
   }
+
+  public String getName() {
+    return name;
+  }
+
+  public int getHealth() {
+    return health;
+  }
+
+  public Zone getZone() {
+    return zone;
+  }
+
+  public Behavior getBehavior() {
+    return behavior;
+  }
 }
