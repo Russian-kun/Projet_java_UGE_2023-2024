@@ -13,11 +13,15 @@ public class Player extends Element {
     super(skin, position, Element.Kind.PLAYER);
     this.health = health;
     this.name = name;
+    if (health < 0)
+      throw new IllegalArgumentException("health must be positive");
   }
 
   public Player(Map<String, String> attributes) {
     super(attributes);
     this.health = Integer.parseInt(attributes.get("health"));
+    if (health < 0)
+      throw new IllegalArgumentException("health must be positive");
   }
 
   public int getHealth() {

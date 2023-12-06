@@ -28,6 +28,10 @@ class Enemy extends Element {
 
   public Enemy(String name, String skin, Position position, int health, Zone zone, String behavior, int damage) {
     super(skin, position, Element.Kind.ENEMY);
+    if (damage < 0)
+      throw new IllegalArgumentException("damage must be positive");
+    if (health < 0)
+      throw new IllegalArgumentException("health must be positive");
     this.name = name;
     this.health = health;
     this.zone = zone;
@@ -38,8 +42,12 @@ class Enemy extends Element {
   public Enemy(Map<String, String> attributes) {
     super(attributes);
     this.health = Integer.parseInt(attributes.get("health"));
+    this.damage = Integer.parseInt(attributes.get("damage"));
+    if (damage < 0)
+      throw new IllegalArgumentException("damage must be positive");
+    if (health < 0)
+      throw new IllegalArgumentException("health must be positive");
     this.zone = Zone.valueOf(attributes.get("zone"));
     this.behavior = Behavior.valueOf(attributes.get("behavior").toUpperCase());
-    this.damage = Integer.parseInt(attributes.get("damage"));
   }
 }

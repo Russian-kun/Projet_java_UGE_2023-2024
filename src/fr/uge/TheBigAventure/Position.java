@@ -13,12 +13,16 @@ class Position {
         String[] tmp = position.replaceAll("[\\(\\)\\ ]", "").split(",");
         this.x = Integer.parseInt(tmp[0]);
         this.y = Integer.parseInt(tmp[1]);
+        if (x < 0 || y < 0)
+            throw new IllegalArgumentException("x and y must be positive");
     }
 
     public static Position valueOf(String position) {
         String[] tmp = position.replaceAll("[\\(\\) ]", "").split(",");
         int x = Integer.parseInt(tmp[0]);
         int y = Integer.parseInt(tmp[1]);
+        if (x < 0 || y < 0)
+            throw new IllegalArgumentException("x and y must be positive");
         return new Position(x, y);
     }
 
