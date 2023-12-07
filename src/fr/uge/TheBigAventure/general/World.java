@@ -89,8 +89,11 @@ public class World {
     Boolean crash = false;
     for (Element tmp : existingItems)
       try {
-        if (tmp.getKind() == Element.Kind.PLAYER)
+        if (tmp.getKind() == Element.Kind.PLAYER) {
+          if (this.player != null)
+            throw new IllegalArgumentException("There can only be one player");
           this.player = (Player) tmp;
+        } // player: true | false, il devrait y avoir qu'un seul player
         else if (tmp.getKind() == Element.Kind.ENEMY)
           enemies.add((Enemy) tmp);
         else if (tmp.getKind() == Element.Kind.ITEM)
