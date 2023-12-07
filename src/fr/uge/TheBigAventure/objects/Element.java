@@ -45,6 +45,7 @@ public abstract class Element {
 
   public enum Kind {
     PLAYER,
+    FRIEND,
     ITEM,
     ENEMY,
     OBSTACLE
