@@ -1,4 +1,4 @@
-package fr.uge.TheBigAventure.personnages;
+package fr.uge.TheBigAventure.characters;
 
 import java.util.Map;
 
@@ -16,9 +16,7 @@ import fr.uge.TheBigAventure.objects.Element;
 //                     zone: (1, 1) (5 x 3)
 //                     behavior: agressive
 //                     damage: 10
-public class Enemy extends Element {
-  private String name;
-  private int health;
+public class Enemy extends Characters {
   private Zone zone;
   private Behavior behavior;
   private int damage;
@@ -31,18 +29,11 @@ public class Enemy extends Element {
   }
 
   public Enemy(String name, String skin, Position position, int health, Zone zone, String behavior, int damage) {
-    super(skin, position, Element.Kind.ENEMY);
+    super(name, skin, health, position, Element.Kind.ENEMY);
     if (damage < 0)
       throw new IllegalArgumentException("damage must be positive");
-    if (health < 0)
-      throw new IllegalArgumentException("health must be positive");
-
-    if (Characters.valueOf(skin.toUpperCase()) == null)
+    if (Characters.CharacterSkin.valueOf(skin.toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a character");
-
-    this.name = name;
-    this.health = health;
-
     if (zone == null)
       zone = new Zone(position, 1, 1);
     else
@@ -56,20 +47,15 @@ public class Enemy extends Element {
 
   public Enemy(Map<String, String> attributes) {
     super(attributes);
-    if (Characters.valueOf(skin.toUpperCase()) == null)
+    if (Characters.CharacterSkin.valueOf(skin.toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a character");
-    this.health = Integer.parseInt(attributes.get("health"));
     this.damage = Integer.parseInt(attributes.get("damage"));
     if (damage < 0)
       throw new IllegalArgumentException("damage must be positive");
-    if (health < 0)
-      throw new IllegalArgumentException("health must be positive");
-
     if (!(attributes.get("zone") == null))
       this.zone = Zone.valueOf(attributes.get("zone"));
     else
       this.zone = new Zone(this.position, 1, 1);
-
     if (!(attributes.get("behavior") == null))
       this.behavior = Behavior.valueOf(attributes.get("behavior").toUpperCase());
     else
