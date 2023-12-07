@@ -1,32 +1,46 @@
 package fr.uge.TheBigAventure.general;
 
-import fr.uge.TheBigAventure.objects.Element;
-import fr.uge.TheBigAventure.objects.Item;
-import fr.uge.TheBigAventure.objects.Obstacles;
-import fr.uge.TheBigAventure.objects.Weapon;
-import fr.uge.TheBigAventure.personnages.Enemy;
-import fr.uge.TheBigAventure.personnages.Player;
 import fr.uge.lexer.Lexer;
 import fr.uge.lexer.Result;
+import fr.uge.TheBigAventure.characters.*;
+import fr.uge.TheBigAventure.display.Display;
+import fr.uge.TheBigAventure.display.Image;
+import fr.uge.TheBigAventure.objects.*;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 
-public record World(int height, int width, String[][] map, Map<String, String> encodings,
-    ArrayList<Element> existingItems) {
+public class World {
+  private int height;
+  private int width;
+  // private String[][] map;
+  private Obstacles[][] worldMap;
+  private Map<String, String> encodings;
+  private Player player;
+  private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+  private ArrayList<Item> items = new ArrayList<Item>();
+  private ArrayList<Obstacles> obstacles = new ArrayList<Obstacles>();
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     encodings.forEach((key, value) -> sb.append(key + " : " + value + "\n"));
+    var tmp = encodings.entrySet();
     for (int i = 0; i < height; i++) {
       sb.append("[");
       for (int j = 0; j < width; j++) {
-        sb.append(map[i][j]);
+        for (var tmp2 : tmp)
+          if (tmp2.getValue().equals(worldMap[i][j].skin())) {
+            sb.append(tmp2.getKey());
+            break;
+          }
         if (j != width - 1)
           sb.append(", ");
       }
@@ -35,10 +49,87 @@ public record World(int height, int width, String[][] map, Map<String, String> e
     return sb.toString();
   }
 
-  public World {
+  public World(int height, int width, String[][] map, Map<String, String> encodings, ArrayList<Element> existingItems) {
     Objects.requireNonNull(encodings);
     Objects.requireNonNull(existingItems);
     Objects.requireNonNull(map);
+    boolean crash = extractObjects(existingItems);
+    this.height = height;
+    this.width = width;
+
+    this.encodings = encodings;
+    crash = createWorldMap(height, width, map) || crash;
+    Objects.requireNonNull(player);
+    if (crash) {
+      System.err.println("Crash while creating world");
+      System.exit(1);
+    }
+  }
+
+  private boolean createWorldMap(int height, int width, String[][] map) {
+    this.worldMap = new Obstacles[height][width];
+    HashSet<String> tmp = new HashSet<String>();
+    boolean crash = false;
+    for (int i = 0; i < height; i++)
+      for (int j = 0; j < width; j++)
+        if (map[i][j] != null) {
+          try {
+            if (tmp.add(map[i][j]))
+              this.worldMap[i][j] = new Obstacles(map[i][j].toUpperCase(), encodings.get(map[i][j]),
+                  new Position(j, i));
+          } catch (Exception e) {
+            e.printStackTrace();
+            crash = true;
+          }
+        }
+    return crash;
+  }
+
+  private boolean extractObjects(ArrayList<Element> existingItems) {
+    Boolean crash = false;
+    for (Element tmp : existingItems)
+      try {
+        if (tmp.getKind() == Element.Kind.PLAYER)
+          this.player = (Player) tmp;
+        else if (tmp.getKind() == Element.Kind.ENEMY)
+          enemies.add((Enemy) tmp);
+        else if (tmp.getKind() == Element.Kind.ITEM)
+          this.items.add((Item) tmp);
+        else if (tmp.getKind() == Element.Kind.OBSTACLE)
+          this.obstacles.add((Obstacles) tmp);
+        else
+          throw new IllegalArgumentException("Element must be a player, an enemy, an item or an obstacle");
+      } catch (Exception e) {
+        System.err.println(e.getMessage());
+        crash = true;
+      }
+    return crash;
+  }
+
+  public int height() {
+    return height;
+  }
+
+  public int width() {
+    return width;
+  }
+
+  public Obstacles[][] worldMap() {
+    return worldMap;
+  }
+
+  public Map<String, String> encodings() {
+    return encodings;
+  }
+
+  public Player player() {
+    return player;
+  }
+
+  public boolean isFree(int x, int y) {
+    if (x < 0 || y < 0 || x >= width || y >= height)
+      return false;
+    return Obstacles.isPassable(worldMap[y][x]);
   }
 
   static private int[] readSize(Lexer lexer) throws IOException {
@@ -65,7 +156,8 @@ public record World(int height, int width, String[][] map, Map<String, String> e
         }
         var res = encodings.putIfAbsent(result.content(), currentName);
         if (!(res == null)) {
-          throw new IOException("Encoding already exist : " + result.content() + " -> " + currentName);
+          throw new IOException("Encoding already exist : " + result.content() + " -> " + currentName + " and "
+              + result.content() + " -> " + res);
         }
 
       } else if (result.token().name().equals("HEADER")) {
@@ -91,7 +183,7 @@ public record World(int height, int width, String[][] map, Map<String, String> e
     for (int currHeight = 1; currHeight < height + 1; currHeight++) {
       String s = split[currHeight].strip();
       if (width != s.length())
-        throw new IOException("Inconsistant map width");
+        throw new IOException("Inconsistant map width : line " + currHeight + " is " + s.length() + " long");
       int currWidth = 0;
 
       for (String tmp2 : s.split("")) {
@@ -145,11 +237,11 @@ public record World(int height, int width, String[][] map, Map<String, String> e
     }
   }
 
-  public static World readMap(Path file) throws IOException {
-    Path path = Path.of("maps/").resolve(file);
-    String text = Files.readString(path);
+  public static World readMap(Path file) throws Exception {
+    String text = Files.readString(Path.of("maps/").resolve(file));
     Lexer lexer = new Lexer(text);
     Result result;
+    boolean crash = false;
 
     int[] dimensions = { 0, 0 };
     HashMap<String, String> encodings = new HashMap<String, String>();
@@ -167,8 +259,6 @@ public record World(int height, int width, String[][] map, Map<String, String> e
           break;
         case "data:":
           map = readData(lexer);
-          if (map.length != dimensions[1] || map[0].length != dimensions[0])
-            throw new IOException("Inconsistant map size");
           break;
         case "[element]":
           Element tmp2 = readElement(lexer);
@@ -177,8 +267,51 @@ public record World(int height, int width, String[][] map, Map<String, String> e
           break;
       }
     }
+    crash = errorCheck(dimensions, encodings, map);
+    if (crash) {
+      throw new IOException("Error while reading map");
+    }
     return new World(dimensions[1], dimensions[0], map, encodings, existingItems);
   }
+
+  private static boolean errorCheck(int[] dimensions, HashMap<String, String> encodings, String[][] map) {
+    boolean crash = false;
+    if (dimensions[0] == 0 || dimensions[1] == 0) {
+      new IOException("Missing dimensions").printStackTrace();
+      crash = true;
+    }
+    if (encodings.isEmpty()) {
+      new IOException("Missing encodings").printStackTrace();
+      crash = true;
+    } else {
+      for (var tmp : encodings.entrySet())
+        if (tmp.getKey().length() != 1) {
+          new IOException("Invalid encoding : " + tmp.getKey() + " is not a letter").printStackTrace();
+          crash = true;
+        }
+    }
+    if (map == null) {
+      new IOException("Missing map data").printStackTrace();
+      crash = true;
+    } else if (map.length != dimensions[1] || map[0].length != dimensions[0]) {
+      new IOException("Invalid map dimensions : " + map.length + "x" + map[0].length + " instead of announced "
+          + dimensions[1] + "x" + dimensions[0]).printStackTrace();
+      crash = true;
+    }
+    return crash || mapValidation(encodings, map);
+  }
+
+  private static boolean mapValidation(HashMap<String, String> encodings, String[][] map) {
+    boolean crash = false;
+    for (String[] tmp : map)
+      for (String tmp2 : tmp)
+        if (tmp2 != null && !encodings.containsKey(tmp2)) {
+          new IOException("Unknown encoding : " + tmp2).printStackTrace();
+          crash = true;
+        }
+    return crash;
+  }
+
   public void draw(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
     var start = System.currentTimeMillis();
     clearPreviousPosition(graphics, display, player);
