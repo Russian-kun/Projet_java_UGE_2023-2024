@@ -179,4 +179,88 @@ public record World(int height, int width, String[][] map, Map<String, String> e
     }
     return new World(dimensions[1], dimensions[0], map, encodings, existingItems);
   }
+  public void draw(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
+    var start = System.currentTimeMillis();
+    clearPreviousPosition(graphics, display, player);
+    drawWorldMap(graphics, display, cachedImages);
+
+    drawElement(graphics, display, cachedImages, player);
+    drawObstacles(graphics, display, cachedImages);
+    drawItems(graphics, display, cachedImages);
+    drawEnemies(graphics, display, cachedImages);
+    var end = System.currentTimeMillis();
+    System.out.println("Draw time : " + (end - start) + "ms");
+  }
+
+  public void drawWorldMap(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
+    var start = System.currentTimeMillis();
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        if (worldMap[i][j] != null) {
+          // On va chercher l'image correspondante dans le dossier images si elle n'est
+          // pas déjà dans le cache
+          // Les images sont nommées comme suit : NOM_0.webp
+          // String skin = worldMap[i][j].skin();
+          // var image = cachedImages.computeIfAbsent(skin, k -> Image.getImage(skin));
+          drawElement(graphics, display, cachedImages, worldMap[i][j]);
+        }
+      }
+    }
+    var end = System.currentTimeMillis();
+    System.out.println("Draw world map time : " + (end - start) + "ms");
+  }
+
+  private void drawObstacles(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
+    var start = System.currentTimeMillis();
+    for (int i = 0; i < obstacles.size(); i++) {
+      Element tmp = obstacles.get(i);
+      drawElement(graphics, display, cachedImages, tmp);
+    }
+    var end = System.currentTimeMillis();
+    System.out.println("Draw obstacles time : " + (end - start) + "ms");
+  }
+
+  private void drawItems(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
+    var start = System.currentTimeMillis();
+    for (int i = 0; i < items.size(); i++) {
+      Element tmp = items.get(i);
+      drawElement(graphics, display, cachedImages, tmp);
+    }
+    var end = System.currentTimeMillis();
+    System.out.println("Draw items time : " + (end - start) + "ms");
+  }
+
+  private void drawEnemies(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
+    var start = System.currentTimeMillis();
+    for (int i = 0; i < enemies.size(); i++) {
+      Enemy tmp = enemies.get(i);
+      clearPreviousPosition(graphics, display, tmp);
+      drawElement(graphics, display, cachedImages, tmp);
+    }
+    var end = System.currentTimeMillis();
+    System.out.println("Draw enemies time : " + (end - start) + "ms");
+  }
+
+  private static void drawElement(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages,
+      Element element) {
+    var start = System.currentTimeMillis();
+    BufferedImage image = cachedImages.computeIfAbsent(element.getSkin(), k -> Image.getImage(element.getSkin()));
+    graphics.drawImage(image,
+        (int) (element.getPosition().getX() * display.caseSize() + display.shiftX()),
+        (int) (element.getPosition().getY() * display.caseSize() + display.shiftY()),
+        null);
+    var end = System.currentTimeMillis();
+    System.out.println("Draw player time : " + (end - start) + "ms");
+  }
+
+  private static void clearPreviousPosition(Graphics2D graphics, Display display, Characters character) {
+    if (character.getPreviousPosition() != null) {
+      Position prev = character.getPreviousPosition();
+      graphics.clearRect(
+          (int) (prev.getX() * display.caseSize() + display.shiftX()),
+          (int) (prev.getY() * display.caseSize() + display.shiftY()),
+          (int) display.caseSize(),
+          (int) display.caseSize());
+    }
+  }
 }
