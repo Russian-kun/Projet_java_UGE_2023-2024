@@ -1,7 +1,9 @@
-package fr.uge.TheBigAventure;
+package fr.uge.TheBigAventure.objects;
 
 import java.util.Map;
 import java.util.Objects;
+
+import fr.uge.TheBigAventure.general.Position;
 
 // Les éléments de la carte sont définie par la section [element] qui définie des sous-sections [element] qui 
 // définissent les éléments. Par exemple, le joueur est défine comme ceci
@@ -36,13 +38,14 @@ import java.util.Objects;
 //                     zone: (1, 1) (5 x 3)
 //                     behavior: agressive
 //                     damage: 10
-abstract class Element {
+public abstract class Element {
   protected String skin;
   protected Position position;
   protected Kind kind;
 
   public enum Kind {
     PLAYER,
+    FRIEND,
     ITEM,
     ENEMY,
     OBSTACLE

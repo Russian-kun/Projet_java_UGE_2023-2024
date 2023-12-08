@@ -1,5 +1,8 @@
 package fr.uge.lexer;
 
+/**
+ * List of tokens used by the lexer.
+ */
 public enum Token {
   HEADER("data:|size:|encodings:|\\[element\\]"),
   ZONE("\\( *[0-9]+ *\\, *[0-9]+ *\\) *\\( *[0-9]+ *x *[0-9]+ *\\)"),
