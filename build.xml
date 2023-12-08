@@ -34,6 +34,7 @@
 
     <!-- Tache pour generer la Javadoc -->
     <target name="javadoc" depends="compile">
+        <mkdir dir="${docs.dir}"/>
         <mkdir dir="${docs.dir}/api"/>
         <javadoc sourcepath="${src.dir}" destdir="${docs.dir}/api">
             <classpath>
