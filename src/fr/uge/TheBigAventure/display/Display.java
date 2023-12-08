@@ -8,7 +8,8 @@ import fr.uge.TheBigAventure.general.World;
 import fr.umlv.zen5.ApplicationContext;
 
 /**
- * Affichage
+ * Classe permettant de calculer et stocker les dimensions de divers éléments de
+ * l'interface graphique.
  */
 public class Display {
   ApplicationContext context;
@@ -21,7 +22,6 @@ public class Display {
     float screenWidth = context.getScreenInfo().getWidth(), screenHeight = context.getScreenInfo().getHeight();
     int width = world.width(), height = world.height();
 
-    // On calcul la taille des cases
     float caseSize = min(screenWidth / width, screenHeight / height);
     this.caseSize = caseSize;
     this.shiftX = (screenWidth - width * caseSize) / 2;

@@ -17,6 +17,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Main class of the game, it contains all the information about the world,
+ * characters, objects, etc.
+ */
 public class World {
   private int height;
   private int width;
@@ -66,6 +70,9 @@ public class World {
     }
   }
 
+  /**
+   * Creates the world map from the map given as a parameter
+   */
   private boolean createWorldMap(int height, int width, String[][] map) {
     this.worldMap = new Obstacles[height][width];
     HashSet<String> tmp = new HashSet<String>();
@@ -74,17 +81,21 @@ public class World {
       for (int j = 0; j < width; j++)
         if (map[i][j] != null) {
           try {
-            if (tmp.add(map[i][j]))
-              this.worldMap[i][j] = new Obstacles(map[i][j].toUpperCase(), encodings.get(map[i][j]),
-                  new Position(j, i));
+            this.worldMap[i][j] = new Obstacles(map[i][j].toUpperCase(), encodings.get(map[i][j]),
+                new Position(j, i));
           } catch (Exception e) {
             e.printStackTrace();
+            tmp.add(map[i][j]);
             crash = true;
           }
         }
     return crash;
   }
 
+  /**
+   * Extracts world objects (player, enemies, items, obstacles) from
+   * the list of objects given as a parameter
+   */
   private boolean extractObjects(ArrayList<Element> existingItems) {
     Boolean crash = false;
     for (Element tmp : existingItems)
@@ -199,8 +210,6 @@ public class World {
   }
 
   private static Element readElement(Lexer lexer) throws IOException {
-    // player, item, enemy, obstacle, vehicle
-    // Pour l'instant: player, item, obstacle, enemy
     HashMap<String, String> attributes = new HashMap<String, String>();
     addAttributes(lexer, attributes);
 
@@ -333,11 +342,9 @@ public class World {
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
         if (worldMap[i][j] != null) {
-          // On va chercher l'image correspondante dans le dossier images si elle n'est
-          // pas déjà dans le cache
-          // Les images sont nommées comme suit : NOM_0.webp
-          // String skin = worldMap[i][j].skin();
-          // var image = cachedImages.computeIfAbsent(skin, k -> Image.getImage(skin));
+          // We will look for the corresponding image in the images folder if it is not
+          // not already in cache
+          // The images are named as follows: NAME_0.webp
           drawElement(graphics, display, cachedImages, worldMap[i][j]);
         }
       }

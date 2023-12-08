@@ -5,10 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 
+/**
+ * Classe servant à stocker les informations d'une image.
+ */
 public class Image {
   private final Path path;
-  private final int width;
-  private final int height;
   private final BufferedImage data;
 
   public Image(Path path) {
@@ -19,8 +20,6 @@ public class Image {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    width = image.getWidth();
-    height = image.getHeight();
     data = image;
   }
 
@@ -30,14 +29,6 @@ public class Image {
 
   public Path getPath() {
     return path;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
   }
 
   public BufferedImage getData() {

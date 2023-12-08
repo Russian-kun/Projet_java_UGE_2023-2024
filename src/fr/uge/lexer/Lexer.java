@@ -7,6 +7,11 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class allowing you to split a character string into tokens.
+ *
+ * Kindly offered by Mr. Forax
+ */
 public class Lexer {
   private static final List<Token> TOKENS = List.of(Token.values());
   // Pour chaque pattern, on fait : (regex) | (regex) | ...

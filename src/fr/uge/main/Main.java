@@ -17,7 +17,7 @@ public class Main {
     int frequency = 1000 / 120;
     Application.run(Color.BLACK, context -> {
       try {
-        World world = World.readMap(Path.of("badGridDataEncodingDefinedTwice.map"));
+        World world = World.readMap(Path.of("fun.map"));
 
         Display affichage = new Display(world, context);
         HashMap<String, BufferedImage> cachedImages = new HashMap<>();
@@ -54,6 +54,7 @@ public class Main {
             // System.out.println("FPS: " + (1000 / (end - start)));
           } catch (InterruptedException e) {
             e.printStackTrace();
+            break;
           }
         }
         context.exit(0);
