@@ -33,7 +33,6 @@
 
     <!-- Tache pour generer la Javadoc -->
     <target name="javadoc" depends="compile">
-        <mkdir dir="${docs.dir}"/>
         <mkdir dir="${docs.dir}/api"/>
         <javadoc sourcepath="${src.dir}" destdir="${docs.dir}/api">
             <classpath>
@@ -47,7 +46,7 @@
     <target name="clean">
         <delete dir="${classes.dir}"/>
         <delete dir="${jar.dir}"/>
-        <delete dir="${docs.dir}"/>
+        <delete dir="${docs.dir}/api"/>
     </target>
 
 </project>
