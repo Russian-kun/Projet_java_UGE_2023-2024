@@ -27,7 +27,6 @@
             <fileset dir="${classes.dir}"/>
             <fileset dir="${lib.dir}" includes="*.jar"/>
             <fileset dir="${maps.dir}" includes="*.map"/>
-            <fileset dir="${docs.dir}" includes="user.pdf, dev.pdf"/>
         </jar>
     </target>
 
@@ -47,7 +46,7 @@
     <target name="clean">
         <delete dir="${classes.dir}"/>
         <delete dir="${jar.dir}"/>
-        <delete dir="${docs.dir}"/>
+        <delete dir="${docs.dir}/api"/>
     </target>
 
 </project>
