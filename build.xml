@@ -27,7 +27,6 @@
             <fileset dir="${classes.dir}"/>
             <fileset dir="${lib.dir}" includes="*.jar"/>
             <fileset dir="${maps.dir}" includes="*.map"/>
-            <fileset dir="${docs.dir}" includes="user.pdf, dev.pdf"/>
         </jar>
     </target>
 
