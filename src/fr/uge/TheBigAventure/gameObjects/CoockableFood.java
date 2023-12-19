@@ -1,4 +1,4 @@
-package fr.uge.TheBigAventure.food;
+package fr.uge.TheBigAventure.gameObjects;
 
 public class CoockableFood extends GeneralFood {
   private boolean isCooked = false;

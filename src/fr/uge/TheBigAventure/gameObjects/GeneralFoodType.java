@@ -1,0 +1,4 @@
+package fr.uge.TheBigAventure.gameObjects;
+
+public interface GeneralFoodType {
+}

@@ -2,41 +2,20 @@
 package fr.uge.TheBigAventure.display;
 
 import static java.lang.Math.min;
-import java.util.Objects;
-
-import fr.uge.TheBigAventure.general.World;
-import fr.umlv.zen5.ApplicationContext;
 
 /**
  * Classe permettant de calculer et stocker les dimensions de divers éléments de
  * l'interface graphique.
  */
-public class Display {
-  ApplicationContext context;
-  private final float caseSize;
-  private final float shiftX;
-  private final float shiftY;
+public record Display(int caseSize, int shiftX, int shiftY) {
 
-  public Display(World world, ApplicationContext context) {
-    Objects.requireNonNull(context);
-    float screenWidth = context.getScreenInfo().getWidth(), screenHeight = context.getScreenInfo().getHeight();
-    int width = world.width(), height = world.height();
-
-    float caseSize = min(screenWidth / width, screenHeight / height);
-    this.caseSize = caseSize;
-    this.shiftX = (screenWidth - width * caseSize) / 2;
-    this.shiftY = (screenHeight - height * caseSize) / 2;
+  public Display {
   }
 
-  public float shiftX() {
-    return shiftX;
-  }
-
-  public float shiftY() {
-    return shiftY;
-  }
-
-  public float caseSize() {
-    return caseSize;
+  public static Display createDisplay(int worldWidth, int worldHeight, int screenWidth, int screenHeight) {
+    int caseSize = min(screenWidth / worldWidth, screenHeight / worldHeight);
+    int shiftX = (screenWidth - worldWidth * caseSize) / 2;
+    int shiftY = (screenHeight - worldHeight * caseSize) / 2;
+    return new Display(caseSize, shiftX, shiftY);
   }
 }

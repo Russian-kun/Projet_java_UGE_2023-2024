@@ -1,4 +1,4 @@
-package fr.uge.TheBigAventure.objects;
+package fr.uge.TheBigAventure.gameObjects;
 
 import java.util.Map;
 import java.util.Objects;
@@ -39,9 +39,9 @@ import fr.uge.TheBigAventure.general.Position;
 //                     behavior: agressive
 //                     damage: 10
 public abstract class Element {
-  protected String skin;
-  protected Position position;
-  protected Kind kind;
+  final GeneralSkin skin;
+  final Kind kind;
+  Position position;
 
   public enum Kind {
     PLAYER,
@@ -51,7 +51,7 @@ public abstract class Element {
     OBSTACLE
   }
 
-  public Element(String skin, Position position, Kind kind) {
+  public Element(GeneralSkin skin, Position position, Kind kind) {
     Objects.requireNonNull(skin);
     Objects.requireNonNull(position);
     Objects.requireNonNull(kind);
@@ -60,14 +60,7 @@ public abstract class Element {
     this.kind = kind;
   }
 
-  public Element(Map<String, String> attributes) {
-    Objects.requireNonNull(attributes);
-    this.skin = attributes.get("skin");
-    this.position = new Position(attributes.get("position"));
-    this.kind = Kind.valueOf(attributes.get("kind").toUpperCase());
-  }
-
-  public String getSkin() {
+  public GeneralSkin getSkin() {
     return skin;
   }
 
@@ -82,6 +75,24 @@ public abstract class Element {
 
   public Kind getKind() {
     return kind;
+  }
+
+  public static Element valueOf(Map<String, String> attributes) {
+    Objects.requireNonNull(attributes);
+    if (attributes.containsKey("player"))
+      attributes.put("kind", "player");
+    return switch (attributes.get("kind")) {
+      case "player" -> Player.valueOf(attributes);
+      case "item" -> {
+        if (attributes.containsKey("damage"))
+          yield Weapon.valueOf(attributes);
+        else
+          yield Item.valueOf(attributes);
+      }
+      case "obstacle" -> Obstacle.valueOf(attributes);
+      case "enemy" -> Enemy.valueOf(attributes);
+      default -> throw new IllegalArgumentException("Unknown element");
+    };
   }
 
 }

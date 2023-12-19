@@ -1,4 +1,4 @@
-package fr.uge.lexer;
+package fr.uge.parser;
 
 import static java.util.stream.Collectors.joining;
 
@@ -22,24 +22,25 @@ public class Lexer {
 
   private final String text;
   private final Matcher matcher;
+  private int line = 0;
 
   private Result lastResult = null;
 
   public Lexer(String text) {
     this.text = Objects.requireNonNull(text);
     this.matcher = PATTERN.matcher(text);
+    this.line = 0;
   }
 
   public Result nextResult() {
-    var matches = matcher.find();
-    if (!matches) {
+    if (!matcher.find())
       return null;
-    }
     for (var group = 1; group <= matcher.groupCount(); group++) {
       var start = matcher.start(group);
       if (start != -1) {
         var end = matcher.end(group);
         var content = text.substring(start, end);
+        line += text.substring(0, end).lines().count();
         lastResult = new Result(TOKENS.get(group - 1), content, start, end);
         return lastResult;
       }
@@ -49,15 +50,6 @@ public class Lexer {
 
   public Result lastResult() {
     return lastResult;
-    // for (var group = 1; group <= matcher.groupCount(); group++) {
-    // var start = matcher.start(group);
-    // if (start != -1) {
-    // var end = matcher.end(group);
-    // var content = text.substring(start, end);
-    // return new Result(TOKENS.get(group - 1), content, start, end);
-    // }
-    // }
-    // throw new AssertionError();
   }
 
   public String text() {
@@ -66,6 +58,10 @@ public class Lexer {
 
   public Matcher matcher() {
     return matcher;
+  }
+
+  public int line() {
+    return line;
   }
 
 }
