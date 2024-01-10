@@ -363,7 +363,7 @@ public class World {
     System.out.println("Draw obstacles time : " + (end - start) + "ms");
   }
 
-  private void drawItems(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
+  public void drawItems(Graphics2D graphics, Display display, HashMap<String, BufferedImage> cachedImages) {
     var start = System.currentTimeMillis();
     for (int i = 0; i < items.size(); i++) {
       Element tmp = items.get(i);
@@ -406,4 +406,26 @@ public class World {
           (int) display.caseSize());
     }
   }
+  
+  public Item getItemPosition(Position position) {
+  	for (Item item : items) {
+  		System.out.println(item.getPosition());
+  		if (item.getPosition().getX() == position.getX() && item.getPosition().getY() == position.getY() ) {
+  			return item;
+  		}
+  	}
+  	return null;
+  }
+  
+  public void removeItemPosition(Position position) {
+  	for(Item item : items) {
+  		if (item.getPosition().getX() == position.getX() && item.getPosition().getY() == position.getY() ) {
+  			items.remove(item);
+  			return;
+  		}
+  	}
+  }
+  
+  
+  
 }
