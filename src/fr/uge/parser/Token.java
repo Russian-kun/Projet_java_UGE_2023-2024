@@ -1,4 +1,4 @@
-package fr.uge.lexer;
+package fr.uge.parser;
 
 /**
  * List of tokens used by the lexer.

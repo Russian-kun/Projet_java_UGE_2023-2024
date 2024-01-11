@@ -1,40 +1,44 @@
 package fr.uge.main;
 
+import java.awt.Color;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.time.LocalTime;
+import java.util.HashMap;
 
 import fr.uge.TheBigAventure.display.Display;
+import fr.uge.TheBigAventure.display.Image;
+import fr.uge.TheBigAventure.display.ImageCache;
+import fr.uge.TheBigAventure.gameObjects.GeneralSkin;
 import fr.uge.TheBigAventure.general.World;
-
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-
-import fr.umlv.zen5.*;
+import fr.uge.parser.Parser;
+import fr.umlv.zen5.Application;
+import fr.umlv.zen5.Event;
+import fr.umlv.zen5.Event.Action;
+import fr.umlv.zen5.KeyboardKey;
 
 public class Main {
   public static void main(String[] args) throws IOException {
-    int frequency = 1000 / 120;
-    Application.run(Color.BLACK, context -> {
-      try {
-        World world = World.readMap(Path.of("fun.map"));
+    final int frequency = 1000 / 120;
+    var filePath = Path.of("fun.map");
+    try {
+      final World world = Parser.readMap(filePath);
+      System.out.println(world);
+      final ImageCache cachedImages = new ImageCache(new HashMap<GeneralSkin, Image>());
 
-        Display affichage = new Display(world, context);
-        HashMap<String, BufferedImage> cachedImages = new HashMap<>();
+      Application.run(Color.BLACK, context -> {
+        Display display = Display.createDisplay(world.worldMap().width(), world.worldMap().height(),
+            (int) context.getScreenInfo().getWidth(),
+            (int) context.getScreenInfo().getHeight());
+
         Event key = null;
-        // Boolean moved = false;
-
-        context.renderFrame(graphics -> {
-          graphics.setColor(Color.WHITE);
-          world.draw(graphics, affichage, cachedImages);
-        });
-
         while (true) {
-          // moved = false;
-          var start = System.currentTimeMillis();
+          var start = LocalTime.now().toNanoOfDay();
           key = context.pollEvent();
-          if (key != null) {
-            world.player().move(world, key);
+          if (key != null && key.getAction() == Action.KEY_PRESSED) {
+            if (KeyboardKey.UP == key.getKey() || KeyboardKey.DOWN == key.getKey() || KeyboardKey.LEFT == key.getKey()
+                || KeyboardKey.RIGHT == key.getKey())
+              world.player().move(world, key);
             if (key.getKey() == KeyboardKey.Q)
               break;
           }
@@ -43,27 +47,29 @@ public class Main {
               // graphics.clearRect(0, 0, (int) context.getScreenInfo().getWidth(), (int)
               // context.getScreenInfo().getHeight());
               graphics.setColor(Color.WHITE);
-              world.draw(graphics, affichage, cachedImages);
+              Display.drawWorld(graphics, display, cachedImages, world);
             });
           while (context.pollEvent() != null) {
           }
           key = null;
-          var end = System.currentTimeMillis();
-          try {
-            Thread.sleep(Math.max(0, frequency - (end - start)));
-            // System.out.println("FPS: " + (1000 / (end - start)));
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-            break;
+          var end = LocalTime.now().toNanoOfDay();
+          var delta = (end - start) / 1000000;
+          if (delta < frequency) {
+            try {
+              Thread.sleep(frequency - delta);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
           }
         }
         context.exit(0);
         System.out.println(world);
-      } catch (Exception e) {
-        e.printStackTrace();
-        context.exit(1);
-      }
-    });
+      });
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
   }
 
 }

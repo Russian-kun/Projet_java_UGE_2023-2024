@@ -1,9 +1,9 @@
 package fr.uge.TheBigAventure.display;
 
-import java.nio.file.Path;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.awt.image.BufferedImage;
+import java.nio.file.Path;
 
 /**
  * Classe servant à stocker les informations d'une image.
@@ -18,7 +18,6 @@ public class Image {
     try {
       image = javax.imageio.ImageIO.read(new File(path.toString()));
     } catch (IOException e) {
-      e.printStackTrace();
     }
     data = image;
   }
@@ -35,7 +34,7 @@ public class Image {
     return data;
   }
 
-  public static BufferedImage getImage(String type) {
-    return new Image(Path.of("images").resolve(type + "_0.gif")).getData();
+  public static Image getImage(String type) {
+    return new Image(Path.of("images").resolve(type + "_0.gif"));
   }
 }
