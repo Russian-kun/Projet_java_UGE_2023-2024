@@ -22,7 +22,7 @@ public class Main {
   static boolean isInventoryVisible = false;
 
   public static void main(String[] args) throws IOException {
-    final int frequency = 1000 / 120;
+    final var frequency = 1000 / 60;
     var filePath = Path.of("fun.map");
     try {
       final World world = Parser.readMap(filePath);
@@ -35,17 +35,20 @@ public class Main {
             (int) context.getScreenInfo().getHeight());
 
         Event key = null;
+        var start = LocalTime.now().toNanoOfDay();
+        var end = LocalTime.now().toNanoOfDay();
+        var delta = (end - start) / 1000000;
         while (true) {
-          var start = LocalTime.now().toNanoOfDay();
+          start = LocalTime.now().toNanoOfDay();
           key = context.pollEvent();
           if (key != null && key.getAction() == Action.KEY_PRESSED) {
             if (KeyboardKey.UP == key.getKey() || KeyboardKey.DOWN == key.getKey() || KeyboardKey.LEFT == key.getKey()
                 || KeyboardKey.RIGHT == key.getKey())
               world.player().move(world, key);
 
-            else if (!isInventoryVisible && key.getKey() == KeyboardKey.I) {
-              // Afficher l'inventaire
+            else if (key.getKey() == KeyboardKey.I && key.getAction() == Action.KEY_PRESSED) {
               isInventoryVisible = true;
+              // Afficher l'inventaire
               display.displayInventory(world, context, cachedImages);
               int pressCount = 0;
 
@@ -63,30 +66,27 @@ public class Main {
             } else if (key.getKey() == KeyboardKey.Q) {
               break;
             }
+            key = null;
           }
-            context.renderFrame(graphics -> {
-              graphics.setColor(Color.WHITE);
-              Display.drawWorld(graphics, display, cachedImages, world);
-            });
-          while (context.pollEvent() != null) {
-          }
-          key = null;
-          var end = LocalTime.now().toNanoOfDay();
-          var delta = (end - start) / 1000000;
+          context.renderFrame(graphics -> {
+            graphics.setColor(Color.WHITE);
+            Display.drawWorld(graphics, display, cachedImages, world);
+          });
+          end = LocalTime.now().toNanoOfDay();
+          delta = (end - start) / 1000000;
           if (delta < frequency) {
             try {
-              Thread.sleep(frequency - delta);
+              Thread.sleep(frequency - delta); // sleep in ms
             } catch (InterruptedException e) {
-              e.printStackTrace();
+              System.err.println(e.getMessage());
             }
           }
         }
         context.exit(0);
         System.out.println(world);
       });
-
     } catch (Exception e) {
-      e.printStackTrace();
+      e.printStackTrace(); // TODO: Replace with system.err
     }
 
   }
