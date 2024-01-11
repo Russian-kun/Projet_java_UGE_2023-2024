@@ -1,5 +1,11 @@
+#VSCode
 .vscode
 
+#Eclipse
+.classpath
+.project
+
+#Java
 *.class
 bin
 classes
