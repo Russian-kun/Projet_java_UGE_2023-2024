@@ -28,7 +28,7 @@ public class GameCharacter extends Element {
     if (CharacterSkin.valueOf(attributes.get("skin").toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a character");
     return new GameCharacter(attributes.get("name"), CharacterSkin.valueOf(attributes.get("skin").toUpperCase()),
-        Integer.parseInt(attributes.get("health")), new Position(attributes.get("position")),
+        Integer.parseInt(attributes.get("health")), Position.valueOf(attributes.get("position")),
         Kind.valueOf(attributes.get("kind").toUpperCase()));
   }
 

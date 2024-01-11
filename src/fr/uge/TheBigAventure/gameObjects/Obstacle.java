@@ -24,7 +24,7 @@ public class Obstacle extends Element {
 
   public static Obstacle valueOf(Map<String, String> attributes) {
     return new Obstacle(attributes.get("name"), getObstacleType(attributes.get("skin")),
-        new Position(attributes.get("position")));
+        Position.valueOf(attributes.get("position")));
   }
 
   public String getName() {

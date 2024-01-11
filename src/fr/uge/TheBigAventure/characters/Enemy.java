@@ -47,7 +47,7 @@ public class Enemy extends GameCharacter {
     if (GameCharacter.CharacterSkin.valueOf(attributes.get("skin").toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a character");
     return new Enemy(attributes.get("name"), GameCharacter.CharacterSkin.valueOf(attributes.get("skin").toUpperCase()),
-        new Position(attributes.get("position")), Integer.parseInt(attributes.get("health")),
+        Position.valueOf(attributes.get("position")), Integer.parseInt(attributes.get("health")),
         Zone.valueOf(attributes.get("zone")), attributes.get("behavior"), Integer.parseInt(attributes.get("damage")));
   }
 

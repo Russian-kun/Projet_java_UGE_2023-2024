@@ -51,7 +51,7 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
 
   public Item getItemPosition(Position position) {
     for (Item item : items) {
-      System.out.println(item.getPosition());
+      System.out.println(item.getPosition().getX() + " " + item.getPosition().getY());
       if (item.getPosition().getX() == position.getX() && item.getPosition().getY() == position.getY()) {
         return item;
       }

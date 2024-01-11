@@ -16,7 +16,7 @@ public class Weapon extends Item {
     if (ItemSkins.valueOf(attributes.get("skin").toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a weapon");
     return new Weapon(attributes.get("name"), ItemSkins.valueOf(attributes.get("skin").toUpperCase()),
-        new Position(attributes.get("position")), Integer.parseInt(attributes.get("damage")));
+        Position.valueOf(attributes.get("position")), Integer.parseInt(attributes.get("damage")));
   }
 
   public int getDamage() {

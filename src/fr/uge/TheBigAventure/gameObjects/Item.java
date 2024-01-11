@@ -32,7 +32,7 @@ public class Item extends Element {
     if (ItemSkins.valueOf(attributes.get("skin").toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be an item");
     return new Item(attributes.get("name"), ItemSkins.valueOf(attributes.get("skin").toUpperCase()),
-        new Position(attributes.get("position")));
+        Position.valueOf(attributes.get("position")));
   }
 
   public String getName() {
