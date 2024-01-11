@@ -2,20 +2,20 @@ package fr.uge.TheBigAventure.characters;
 
 import java.util.Map;
 
+import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.general.Position;
-import fr.uge.TheBigAventure.objects.Element;
 
-public class Characters extends Element {
-  protected int health;
-  protected String name;
-  protected Position previousPosition = null;
+public class GameCharacter extends Element {
+  int health;
+  final String name;
+  Position previousPosition = null;
 
-  public enum CharacterSkin {
+  public enum CharacterSkin implements GeneralCharacterSkin {
     BABA, BADBAD, BAT, BEE, BIRD, BUG, BUNNY, CAT, CRAB, DOG, FISH, FOFO, FROG, GHOST, IT, JELLY, JIJI, KEKE, LIZARD,
     ME, MONSTER, ROBOT, SNAIL, SKULL, TEETH, TURTLE, WORM
   }
 
-  public Characters(String name, String skin, int health, Position position, Kind kind) {
+  public GameCharacter(String name, CharacterSkin skin, int health, Position position, Kind kind) {
     super(skin, position, kind);
     if (health < 0)
       throw new IllegalArgumentException("health must be positive");
@@ -24,12 +24,12 @@ public class Characters extends Element {
     this.health = health;
   }
 
-  public Characters(Map<String, String> attributes) {
-    super(attributes);
-    if (Characters.CharacterSkin.valueOf(skin.toUpperCase()) == null)
+  public static GameCharacter valueOf(Map<String, String> attributes) {
+    if (CharacterSkin.valueOf(attributes.get("skin").toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a character");
-    this.health = Integer.parseInt(attributes.get("health"));
-    this.name = attributes.get("name");
+    return new GameCharacter(attributes.get("name"), CharacterSkin.valueOf(attributes.get("skin").toUpperCase()),
+        Integer.parseInt(attributes.get("health")), Position.valueOf(attributes.get("position")),
+        Kind.valueOf(attributes.get("kind").toUpperCase()));
   }
 
   public String getName() {
@@ -45,28 +45,32 @@ public class Characters extends Element {
   }
 
   public void moveUp() {
-    previousPosition = new Position(position.getX(), position.getY());
+    previousPosition.setY(position.getY());
     position.setY(position.getY() - 1);
   }
 
   public void moveDown() {
-    previousPosition = new Position(position.getX(), position.getY());
+    previousPosition.setY(position.getY());
     position.setY(position.getY() + 1);
   }
 
   public void moveLeft() {
-    previousPosition = new Position(position.getX(), position.getY());
+    previousPosition.setX(position.getX());
     position.setX(position.getX() - 1);
   }
 
   public void moveRight() {
-    previousPosition = new Position(position.getX(), position.getY());
+    previousPosition.setX(position.getX());
     position.setX(position.getX() + 1);
   }
 
   public void moveBack() {
+    var tmp = new Position(position.getX(), position.getY());
+
     if (previousPosition != null)
       position = previousPosition;
+    previousPosition.setX(tmp.getX());
+    previousPosition.setY(tmp.getY());
   }
 
   public Position getPreviousPosition() {

@@ -16,7 +16,7 @@ public class Zone {
     // "(38, 24) (10 x 8)"
     String[] tot = zone.split("\\) *\\(");
     String[] dim = tot[1].replaceAll("[\\(\\) ]", "").split("x");
-    return new Zone(new Position(tot[0]), Integer.parseInt(dim[0]), Integer.parseInt(dim[1]));
+    return new Zone(Position.valueOf(tot[0]), Integer.parseInt(dim[0]), Integer.parseInt(dim[1]));
   }
 
   public Position getTopLeft() {

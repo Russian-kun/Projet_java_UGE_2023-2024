@@ -2,9 +2,9 @@ package fr.uge.TheBigAventure.characters;
 
 import java.util.Map;
 
+import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.Zone;
-import fr.uge.TheBigAventure.objects.Element;
 
 // un ennemi est défini comme cela
 //                   [element]
@@ -16,7 +16,7 @@ import fr.uge.TheBigAventure.objects.Element;
 //                     zone: (1, 1) (5 x 3)
 //                     behavior: agressive
 //                     damage: 10
-public class Enemy extends Characters {
+public class Enemy extends GameCharacter {
   private Zone zone;
   private Behavior behavior;
   private int damage;
@@ -28,12 +28,10 @@ public class Enemy extends Characters {
     AGRESSIVE
   }
 
-  public Enemy(String name, String skin, Position position, int health, Zone zone, String behavior, int damage) {
+  public Enemy(String name, CharacterSkin skin, Position position, int health, Zone zone, String behavior, int damage) {
     super(name, skin, health, position, Element.Kind.ENEMY);
     if (damage < 0)
       throw new IllegalArgumentException("damage must be positive");
-    if (Characters.CharacterSkin.valueOf(skin.toUpperCase()) == null)
-      throw new IllegalArgumentException("skin must be a character");
     if (zone == null)
       zone = new Zone(position, 1, 1);
     else
@@ -45,27 +43,20 @@ public class Enemy extends Characters {
     this.damage = damage;
   }
 
-  public Enemy(Map<String, String> attributes) {
-    super(attributes);
-    if (Characters.CharacterSkin.valueOf(skin.toUpperCase()) == null)
+  public static Enemy valueOf(Map<String, String> attributes) {
+    if (GameCharacter.CharacterSkin.valueOf(attributes.get("skin").toUpperCase()) == null)
       throw new IllegalArgumentException("skin must be a character");
-    this.damage = Integer.parseInt(attributes.get("damage"));
-    if (damage < 0)
-      throw new IllegalArgumentException("damage must be positive");
-    if (!(attributes.get("zone") == null))
-      this.zone = Zone.valueOf(attributes.get("zone"));
-    else
-      this.zone = new Zone(this.position, 1, 1);
-    if (!(attributes.get("behavior") == null))
-      this.behavior = Behavior.valueOf(attributes.get("behavior").toUpperCase());
-    else
-      this.behavior = Behavior.STROLL;
+    return new Enemy(attributes.get("name"), GameCharacter.CharacterSkin.valueOf(attributes.get("skin").toUpperCase()),
+        Position.valueOf(attributes.get("position")), Integer.parseInt(attributes.get("health")),
+        Zone.valueOf(attributes.get("zone")), attributes.get("behavior"), Integer.parseInt(attributes.get("damage")));
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public int getHealth() {
     return health;
   }

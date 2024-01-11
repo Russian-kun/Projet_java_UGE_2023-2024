@@ -1,20 +1,16 @@
 package fr.uge.TheBigAventure.general;
 
 public class Position {
-  private int x;
-  private int y;
+  private int x, y;
 
   public Position(int x, int y) {
     this.x = x;
     this.y = y;
   }
 
-  public Position(String position) {
-    String[] tmp = position.replaceAll("[\\(\\)\\ ]", "").split(",");
-    this.x = Integer.parseInt(tmp[0]);
-    this.y = Integer.parseInt(tmp[1]);
-    if (x < 0 || y < 0)
-      throw new IllegalArgumentException("x and y must be positive");
+  @Override
+  public String toString() {
+    return "(" + x + "," + y + ")";
   }
 
   public static Position valueOf(String position) {
