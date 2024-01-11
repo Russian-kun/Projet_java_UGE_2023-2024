@@ -86,21 +86,6 @@ public class Parser {
     return new World(player, map, encoding, enemies, items, obstacles);
   }
 
-  // private static ElementGroups discriminateElements(Element element) {
-  // ArrayList<Enemy> enemies = new ArrayList<>();
-  // ArrayList<Item> items = new ArrayList<>();
-  // ArrayList<Obstacle> obstacles = new ArrayList<>();
-  // Player player = null;
-  // switch (element) {
-  // case Enemy e -> enemies.add(e);
-  // case Item i -> items.add(i);
-  // case Obstacle o -> obstacles.add(o);
-  // case Player p -> player = p;
-  // default -> throw new IllegalArgumentException("Unknown element");
-  // }
-  // return
-  // }
-
   private static Element parseElement(Lexer lexer) throws IOException {
     HashMap<String, String> attributes = new HashMap<String, String>();
     addAttributes(lexer, attributes);

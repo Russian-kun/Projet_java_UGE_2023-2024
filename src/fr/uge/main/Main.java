@@ -64,10 +64,7 @@ public class Main {
               break;
             }
           }
-          if (key != null)
             context.renderFrame(graphics -> {
-              // graphics.clearRect(0, 0, (int) context.getScreenInfo().getWidth(), (int)
-              // context.getScreenInfo().getHeight());
               graphics.setColor(Color.WHITE);
               Display.drawWorld(graphics, display, cachedImages, world);
             });
