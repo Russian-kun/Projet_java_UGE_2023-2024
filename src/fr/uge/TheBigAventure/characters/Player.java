@@ -80,9 +80,18 @@ public class Player extends GameCharacter {
       default:
         break;
     }
+    if(moved) {
+	  	Item item = world.getItemPosition(position);
+	    System.out.println(item);
+	    if (item != null) {
+	        addItem(item);
+	        world.removeItemPosition(position);
+	    }
+    }
     return moved;
   }
-
+  
+  
   public void attack(Enemy enemy) {
     enemy.setHealth(enemy.getHealth() - 1);
   }

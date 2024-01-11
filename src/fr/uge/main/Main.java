@@ -18,6 +18,9 @@ import fr.umlv.zen5.Event.Action;
 import fr.umlv.zen5.KeyboardKey;
 
 public class Main {
+
+  static boolean isInventoryVisible = false;
+
   public static void main(String[] args) throws IOException {
     final int frequency = 1000 / 120;
     var filePath = Path.of("fun.map");
@@ -39,8 +42,27 @@ public class Main {
             if (KeyboardKey.UP == key.getKey() || KeyboardKey.DOWN == key.getKey() || KeyboardKey.LEFT == key.getKey()
                 || KeyboardKey.RIGHT == key.getKey())
               world.player().move(world, key);
-            if (key.getKey() == KeyboardKey.Q)
+
+            else if (!isInventoryVisible && key.getKey() == KeyboardKey.I) {
+              // Afficher l'inventaire
+              isInventoryVisible = true;
+              display.displayInventory(world, context, cachedImages);
+              int pressCount = 0;
+
+              do {
+                key = context.pollEvent();
+                if (key != null && key.getKey() == KeyboardKey.I) {
+                  pressCount++;
+                }
+              } while (pressCount < 2);
+
+              // Cacher l'inventaire
+              isInventoryVisible = false;
+              display.hideInventory(world, context, display, cachedImages);
+
+            } else if (key.getKey() == KeyboardKey.Q) {
               break;
+            }
           }
           if (key != null)
             context.renderFrame(graphics -> {

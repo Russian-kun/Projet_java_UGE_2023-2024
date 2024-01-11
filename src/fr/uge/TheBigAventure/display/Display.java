@@ -2,14 +2,19 @@ package fr.uge.TheBigAventure.display;
 
 import static java.lang.Math.min;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import fr.uge.TheBigAventure.characters.GameCharacter;
 import fr.uge.TheBigAventure.gameObjects.Element;
+import fr.uge.TheBigAventure.gameObjects.Item;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
 import fr.uge.TheBigAventure.general.WorldMap;
+import fr.umlv.zen5.ApplicationContext;
 
 /**
  * Classe permettant de calculer et stocker les dimensions de divers éléments de
@@ -87,4 +92,48 @@ public record Display(int caseSize, int shiftX, int shiftY) {
           (int) display.caseSize());
     }
   }
+
+  public void displayInventory(World world, ApplicationContext context, ImageCache cachedImages) {
+    context.renderFrame(graphics -> {
+      drawInventoryRectangle(graphics, context, Color.DARK_GRAY, Color.WHITE, 2.0f);
+      drawItemsInInventory(graphics, context, world.player().getInventory(), cachedImages);
+    });
+  }
+
+  private void drawInventoryRectangle(Graphics2D graphics, ApplicationContext context, Color fillColor,
+      Color borderColor, float borderThickness) {
+    graphics.setColor(fillColor);
+    float inventoryX = context.getScreenInfo().getWidth() / 2 - 250;
+    float inventoryY = context.getScreenInfo().getHeight() / 2 - 250;
+    float inventoryWidth = 500;
+    float inventoryHeight = 500;
+
+    graphics.fill(new Rectangle2D.Float(inventoryX, inventoryY, inventoryWidth, inventoryHeight));
+
+    graphics.setColor(borderColor);
+    graphics.setStroke(new BasicStroke(borderThickness));
+    graphics.draw(new Rectangle2D.Float(inventoryX, inventoryY, inventoryWidth, inventoryHeight));
+  }
+
+  private void drawItemsInInventory(Graphics2D graphics, ApplicationContext context, List<Item> items,
+      ImageCache cachedImages) {
+    float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
+    float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
+
+    for (Item item : items) {
+      Image image = cachedImages.getImage(item);
+      graphics.drawImage(image.getData(), (int) inventoryX, (int) inventoryY, (int) caseSize, (int) caseSize, null);
+      inventoryX += caseSize + 10;
+    }
+  }
+
+  public void hideInventory(World world, ApplicationContext context, Display show,
+      ImageCache cachedImages) {
+    context.renderFrame(graphics -> {
+      graphics.clearRect(0, 0, (int) context.getScreenInfo().getWidth(), (int) context.getScreenInfo().getHeight());
+      graphics.setColor(Color.WHITE);
+      Display.drawWorld(graphics, show, cachedImages, world);
+    });
+  }
+
 }
