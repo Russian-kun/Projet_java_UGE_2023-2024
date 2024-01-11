@@ -50,14 +50,14 @@ public class Parser {
             dimensions = parseSize(lexer);
             break;
           case "encodings:":
-            encodings = parseEncoding(lexer); // TODO opti
+            encodings = parseEncoding(lexer);
             lexer = new Lexer(text.substring(lexer.lastResult().start()));
             break;
           case "data:":
-            data = parseData(lexer); // TODO opti
+            data = parseData(lexer);
             break;
           case "[element]":
-            Element tmp2 = parseElement(lexer); // TODO opti
+            Element tmp2 = parseElement(lexer);
             switch (tmp2) {
               case Enemy e -> enemies.add(e);
               case Item i -> items.add(i);
@@ -75,7 +75,7 @@ public class Parser {
     }
 
     Encoding encoding = new Encoding(encodings);
-    map = WorldMap.interpretMap(data, encoding); // TODO opti
+    map = WorldMap.interpretMap(data, encoding);
     exceptions.addAll(errorCheck(dimensions, encodings, map));
     if (exceptions.size() != 0) {
       for (var e : exceptions)
