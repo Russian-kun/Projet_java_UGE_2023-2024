@@ -24,8 +24,14 @@ public class Main {
   public static void main(String[] args) throws IOException {
     final var frequency = 1000 / 60;
     var filePath = Path.of("fun.map");
+    final World world;
     try {
-      final World world = Parser.readMap(filePath);
+      world = Parser.readMap(filePath);
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+      return;
+    }
+    try {
       System.out.println(world);
       final ImageCache cachedImages = new ImageCache(new HashMap<GeneralSkin, Image>());
 

@@ -37,7 +37,7 @@ public class Parser {
     String[][] data = null;
     WorldMap map = null;
     final ArrayList<Element> foundElements = new ArrayList<>();
-    final ArrayList<Exception> exceptions = new ArrayList<>();
+    final ParsingException exceptions = new ParsingException(new ArrayList<>());
     final ArrayList<Enemy> enemies = new ArrayList<>();
     final ArrayList<Item> items = new ArrayList<>();
     final ArrayList<Obstacle> obstacles = new ArrayList<>();
@@ -63,29 +63,35 @@ public class Parser {
               case Item i -> items.add(i);
               case Obstacle o -> obstacles.add(o);
               case Player p -> player = p;
-              default -> throw new IllegalArgumentException("Unknown element");
+              default -> exceptions.addException(new IllegalArgumentException("Unknown element"));
             }
             foundElements.add(tmp2);
             lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
             break;
         }
-      } catch (Exception e) {
-        exceptions.add(e);
+      } catch (IOException e) {
+        exceptions.addException(e);
       }
     }
 
     Encoding encoding = new Encoding(encodings);
     map = WorldMap.interpretMap(data, encoding);
-    exceptions.addAll(errorCheck(dimensions, encodings, map));
+    exceptions.addAllException(errorCheck(dimensions, encodings, map));
     if (exceptions.size() != 0) {
-      for (var e : exceptions)
-        System.err.println(e.getMessage());
+      System.err.println(exceptions);
       System.err.println("Error while parsing map");
       return null;
     }
     return new World(player, map, encoding, enemies, items, obstacles);
   }
 
+  /**
+   * Parse an element from the lexer
+   * 
+   * @param lexer
+   * @return
+   * @throws IOException
+   */
   private static Element parseElement(Lexer lexer) throws IOException {
     HashMap<String, String> attributes = new HashMap<String, String>();
     addAttributes(lexer, attributes);
@@ -114,6 +120,13 @@ public class Parser {
     }
   }
 
+  /**
+   * Parse the size of the map
+   * 
+   * @param lexer
+   * @return
+   * @throws IOException
+   */
   private static int[] parseSize(Lexer lexer) throws IOException {
     int[] tmp = { 0, 0 };
     Result result;
@@ -127,6 +140,13 @@ public class Parser {
     return tmp;
   }
 
+  /**
+   * Parse the encodings of the map
+   * 
+   * @param lexer
+   * @return
+   * @throws IOException
+   */
   private static Map<String, String> parseEncoding(Lexer lexer) throws IOException {
     HashMap<String, String> encodings = new HashMap<String, String>();
 
@@ -150,6 +170,13 @@ public class Parser {
     return encodings;
   }
 
+  /**
+   * Parse the data of the map
+   * 
+   * @param lexer
+   * @return
+   * @throws IOException
+   */
   private static String[][] parseData(Lexer lexer) throws IOException {
     Result result;
     while ((result = lexer.nextResult()) != null && !result.token().name().equals("QUOTE")) {
