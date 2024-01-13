@@ -3,27 +3,31 @@ package fr.uge.TheBigAventure.display;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 /**
  * Classe servant à stocker les informations d'une image.
  */
-public class Image {
-  private final Path path;
-  private final BufferedImage data;
+public record Image(Path path, BufferedImage data) {
 
-  public Image(Path path) {
+  public Image(Path path, BufferedImage data) {
     this.path = path;
+    this.data = data;
+  }
+
+  public static Image searchImage(Path path) {
     BufferedImage image = null;
     try {
       image = javax.imageio.ImageIO.read(new File(path.toString()));
     } catch (IOException e) {
+      image = null;
     }
-    data = image;
+    return new Image(path, image);
   }
 
-  public Image(String path) {
-    this(Path.of(path));
+  public static Image searchImage(String path) {
+    return searchImage(Path.of(path));
   }
 
   public Path getPath() {
@@ -35,6 +39,8 @@ public class Image {
   }
 
   public static Image getImage(String type) {
-    return new Image(Path.of("images").resolve(type + "_0.gif"));
+    return searchImage(Path.of("resources/images").resolve(type + "_0.gif"));
+  }
+
   }
 }
