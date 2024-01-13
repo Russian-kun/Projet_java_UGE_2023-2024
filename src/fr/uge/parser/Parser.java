@@ -238,9 +238,9 @@ public class Parser {
   private static List<Exception> mapValidation(Map<String, String> encodings, Obstacle[][] map) {
     ArrayList<Exception> list = new ArrayList<>();
     for (var col : map)
-      for (var lin : col)
-        if (lin != null && !encodings.containsKey(lin.getName()))
-          list.add(new IOException("Unknown encoding : " + lin.getName()));
+      for (var line : col)
+        if (line != null && !encodings.containsKey(line.getName()))
+          list.add(new IOException("Unknown encoding : " + line.getName()));
     return list;
   }
 }
