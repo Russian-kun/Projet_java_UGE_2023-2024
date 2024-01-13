@@ -191,7 +191,7 @@ public class Parser {
     for (int currHeight = 1; currHeight < height + 1; currHeight++) {
       String s = split[currHeight].strip();
       if (width != s.length())
-        throw new IOException("Inconsistant map width : line " + currHeight + " is " + s.length() + " long");
+        throw new IOException("Inconsistent map width : line " + currHeight + " is " + s.length() + " long");
       int currWidth = 0;
 
       for (String tmp2 : s.split("")) {
