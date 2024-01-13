@@ -205,8 +205,19 @@ public class Parser {
 
   private static List<Exception> errorCheck(int[] dimensions, Map<String, String> encodings, WorldMap map) {
     ArrayList<Exception> list = new ArrayList<>();
+    checkDimensions(dimensions, list);
+    checkEncodings(encodings, list);
+    checkMapData(dimensions, map, list);
+    list.addAll(mapValidation(encodings, map.map()));
+    return list;
+  }
+
+  private static void checkDimensions(int[] dimensions, List<Exception> list) {
     if (dimensions[0] == 0 || dimensions[1] == 0)
       list.add(new IOException("Missing dimensions"));
+  }
+
+  private static void checkEncodings(Map<String, String> encodings, List<Exception> list) {
     if (encodings.isEmpty())
       list.add(new IOException("Missing encodings"));
     else {
@@ -214,14 +225,14 @@ public class Parser {
         if (tmp.getKey().length() != 1)
           list.add(new IOException("Invalid encoding : " + tmp.getKey() + " is not a letter"));
     }
+  }
+
+  private static void checkMapData(int[] dimensions, WorldMap map, List<Exception> list) {
     if (map == null)
       list.add(new IOException("Missing map data"));
     else if (map.height() != dimensions[1] || map.width() != dimensions[0])
       list.add(new IOException("Invalid map dimensions : " + map.height() + "x" + map.width() + " instead of announced "
           + dimensions[1] + "x" + dimensions[0]));
-
-    list.addAll(mapValidation(encodings, map.map()));
-    return list;
   }
 
   private static List<Exception> mapValidation(Map<String, String> encodings, Obstacle[][] map) {
