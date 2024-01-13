@@ -163,7 +163,7 @@ public class Parser {
                   + result.content() + " -> " + res);
         }
 
-      } else if (result.token().name().equals("HEADER")) {
+      } else if (result.token().name().equals("HEADER") && !result.content().equals("encodings:")) {
         break;
       }
     }
