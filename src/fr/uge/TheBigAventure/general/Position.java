@@ -22,6 +22,15 @@ public class Position {
     return new Position(x, y);
   }
 
+  public static boolean moveIfFree(World world, Position position, int x, int y) {
+    if (world.isFree(x, y)) {
+      position.setX(x);
+      position.setY(y);
+      return true;
+    }
+    return false;
+  }
+
   public int getX() {
     return x;
   }

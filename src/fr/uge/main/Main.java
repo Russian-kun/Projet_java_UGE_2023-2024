@@ -11,6 +11,7 @@ import fr.uge.TheBigAventure.display.Image;
 import fr.uge.TheBigAventure.display.ImageCache;
 import fr.uge.TheBigAventure.gameObjects.GeneralSkin;
 import fr.uge.TheBigAventure.general.World;
+import fr.uge.TheBigAventure.keys.AcceptedKeys;
 import fr.uge.parser.Parser;
 import fr.umlv.zen5.Application;
 import fr.umlv.zen5.Event;
@@ -27,6 +28,10 @@ public class Main {
     final World world;
     try {
       world = Parser.readMap(filePath);
+      if (world == null) {
+        System.err.println("Error while parsing map");
+        return;
+      }
     } catch (IOException e) {
       System.err.println(e.getMessage());
       return;
@@ -40,27 +45,27 @@ public class Main {
             (int) context.getScreenInfo().getWidth(),
             (int) context.getScreenInfo().getHeight());
 
-        Event key = null;
+        Event event = null;
         var start = LocalTime.now().toNanoOfDay();
         var end = LocalTime.now().toNanoOfDay();
         var delta = (end - start) / 1000000;
         while (true) {
           start = LocalTime.now().toNanoOfDay();
-          key = context.pollEvent();
-          if (key != null && key.getAction() == Action.KEY_PRESSED) {
-            if (KeyboardKey.UP == key.getKey() || KeyboardKey.DOWN == key.getKey() || KeyboardKey.LEFT == key.getKey()
-                || KeyboardKey.RIGHT == key.getKey())
+          event = context.pollEvent();
+          KeyboardKey key = null;
+          if (event != null && event.getAction() == Action.KEY_PRESSED) {
+            if (AcceptedKeys.isMovementKey((key = event.getKey())))
               world.player().move(world, key);
 
-            else if (key.getKey() == KeyboardKey.I && key.getAction() == Action.KEY_PRESSED) {
+            else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
               isInventoryVisible = true;
               // Afficher l'inventaire
               display.displayInventory(world, context, cachedImages);
               int pressCount = 0;
 
               do {
-                key = context.pollEvent();
-                if (key != null && key.getKey() == KeyboardKey.I) {
+                event = context.pollEvent();
+                if (event != null && event.getKey() == KeyboardKey.I) {
                   pressCount++;
                 }
               } while (pressCount < 2);
@@ -69,10 +74,10 @@ public class Main {
               isInventoryVisible = false;
               display.hideInventory(world, context, display, cachedImages);
 
-            } else if (key.getKey() == KeyboardKey.Q) {
+            } else if (key == KeyboardKey.Q) {
               break;
             }
-            key = null;
+            event = null;
           }
           context.renderFrame(graphics -> {
             graphics.setColor(Color.WHITE);
@@ -93,6 +98,7 @@ public class Main {
       });
     } catch (Exception e) {
       e.printStackTrace(); // TODO: Replace with system.err
+      System.out.println("Error while running Zen5");
     }
 
   }

@@ -7,7 +7,7 @@ import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
-import fr.umlv.zen5.Event;
+import fr.umlv.zen5.KeyboardKey;
 
 public class Player extends GameCharacter {
   private final ArrayList<Item> inventory = new ArrayList<>();
@@ -55,41 +55,36 @@ public class Player extends GameCharacter {
     return inventory;
   }
 
-  public boolean move(World world, Event event) {
-    if (event == null)
-      throw new IllegalArgumentException("event must not be null");
+  public boolean move(World world, KeyboardKey key) {
+    if (key == null)
+      throw new IllegalArgumentException("key must not be null");
     previousPosition = new Position(position.getX(), position.getY());
     boolean moved = false;
-    switch (event.getKey()) {
-      case UP:
-        if ((moved = world.isFree(position.getX(), position.getY() - 1)))
-          moveUp();
-        break;
-      case DOWN:
-        if ((moved = world.isFree(position.getX(), position.getY() + 1)))
-          moveDown();
-        break;
-      case LEFT:
-        if ((moved = world.isFree(position.getX() - 1, position.getY())))
-          moveLeft();
-        break;
-      case RIGHT:
-        if ((moved = world.isFree(position.getX() + 1, position.getY())))
-          moveRight();
-        break;
-      default:
-        break;
+    switch (key) {
+      case UP ->
+        moved = moveIfFree(world, position.getX(), position.getY() - 1);
+      case DOWN ->
+        moved = moveIfFree(world, position.getX(), position.getY() + 1);
+      case LEFT ->
+        moved = moveIfFree(world, position.getX() - 1, position.getY());
+      case RIGHT ->
+        moved = moveIfFree(world, position.getX() + 1, position.getY());
+      default ->
+        throw new IllegalArgumentException("key must be a movement key");
     }
     if (moved) {
       Item item = world.getItemPosition(position);
-      if (item != null)
-        System.out.println(item.getName());
       if (item != null) {
+        System.out.println(item.getName());
         addItem(item);
         world.removeItemPosition(position);
       }
     }
     return moved;
+  }
+
+  public boolean moveIfFree(World world, int x, int y) {
+    return Position.moveIfFree(world, position, x, y);
   }
 
   public void attack(Enemy enemy) {
