@@ -7,7 +7,10 @@ public class ParsingException extends Exception {
   private final ArrayList<Exception> exceptions;
 
   public ParsingException(List<Exception> exceptions) {
-    this.exceptions = new ArrayList<>(exceptions);
+    if (exceptions == null)
+      this.exceptions = new ArrayList<>();
+    else
+      this.exceptions = new ArrayList<>(exceptions);
   }
 
   public List<Exception> getExceptions() {
