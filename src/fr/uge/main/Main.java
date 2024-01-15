@@ -101,7 +101,7 @@ public class Main {
       });
     } catch (Exception e) {
       e.printStackTrace(); // TODO: Replace with system.err
-      System.out.println("Error while running Zen5");
+      System.err.println("Error while running Zen5");
     }
 
   }

@@ -52,7 +52,7 @@ public record Image(Path path, BufferedImage data) {
   public static Image getImageInJar(String type) {
     InputStream is = Image.class.getResourceAsStream("/images/" + type + "_0.gif");
     if (is == null) {
-      System.out.println("Image not found " + type + "_0.gif");
+      System.err.println("Image not found " + type + "_0.gif");
       return null;
     }
     try {
