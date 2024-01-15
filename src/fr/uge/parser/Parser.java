@@ -28,61 +28,125 @@ public class Parser {
    *                     reading it
    */
   public static World readMap(Path file) throws IOException {
-    String text = Files.readString(Path.of("maps/").resolve(file));
+    String text = Files.readString(Path.of("resources/maps/").resolve(file));
     Lexer lexer = new Lexer(text);
-    Result result;
+    ParsingException exceptions = new ParsingException(null);
 
-    int[] dimensions = { 0, 0 };
-    Map<String, String> encodings = null;
-    String[][] data = null;
-    WorldMap map = null;
-    final ArrayList<Element> foundElements = new ArrayList<>();
-    final ParsingException exceptions = new ParsingException(new ArrayList<>());
-    final ArrayList<Enemy> enemies = new ArrayList<>();
-    final ArrayList<Item> items = new ArrayList<>();
-    final ArrayList<Obstacle> obstacles = new ArrayList<>();
-    Player player = null;
-
-    while ((result = lexer.nextResult()) != null) {
-      try {
-        switch (result.content()) {
-          case "size:":
-            dimensions = parseSize(lexer);
-            break;
-          case "encodings:":
-            encodings = parseEncoding(lexer);
-            lexer = new Lexer(text.substring(lexer.lastResult().start()));
-            break;
-          case "data:":
-            data = parseData(lexer);
-            break;
-          case "[element]":
-            Element tmp2 = parseElement(lexer);
-            switch (tmp2) {
-              case Enemy e -> enemies.add(e);
-              case Item i -> items.add(i);
-              case Obstacle o -> obstacles.add(o);
-              case Player p -> player = p;
-              default -> exceptions.addException(new IllegalArgumentException("Unknown element"));
-            }
-            foundElements.add(tmp2);
-            lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
-            break;
-        }
-      } catch (IOException e) {
-        exceptions.addException(e);
-      }
-    }
+    int[] dimensions = parseSize(lexer, exceptions);
+    Map<String, String> encodings = parseEncoding(lexer, exceptions);
+    String[][] data = parseData(lexer, exceptions);
+    WorldMap map = parseMap(data, encodings);
+    ArrayList<Element> foundElements = parseElements(lexer, exceptions);
+    ArrayList<Enemy> enemies = new ArrayList<>();
+    ArrayList<Item> items = new ArrayList<>();
+    ArrayList<Obstacle> obstacles = new ArrayList<>();
+    Player player = separateElements(foundElements, enemies, items, obstacles, exceptions);
 
     Encoding encoding = new Encoding(encodings);
-    map = WorldMap.interpretMap(data, encoding);
     exceptions.addAllException(errorCheck(dimensions, encodings, map));
     if (exceptions.size() != 0) {
       System.err.println(exceptions);
-      System.err.println("Error while parsing map");
       return null;
     }
     return new World(player, map, encoding, enemies, items, obstacles);
+  }
+
+  /**
+   * Parse the encodings of the map
+   * 
+   * @param lexer
+   * @return
+   * @throws IOException
+   */
+  private static Map<String, String> parseEncoding(Lexer lexer, ParsingException pe) {
+    HashMap<String, String> encodings = new HashMap<String, String>();
+
+    Result result;
+    while ((result = lexer.nextResult()) != null) {
+      String currentName = result.content();
+      if (result.token().name().equals("IDENTIFIER")) {
+        result = findNextIdentifier(lexer, "IDENTIFIER");
+        var res = encodings.putIfAbsent(result.content(), currentName);
+        if (!(res == null)) {
+          pe.addException(new IOException(
+              "Encoding already exist line " + lexer.line() + " : " + result.content() + " -> " + currentName + " and "
+                  + result.content() + " -> " + res));
+        }
+
+      } else if (result.token().name().equals("HEADER") && !result.content().equals("encodings:")) {
+        break;
+      }
+    }
+    return encodings;
+  }
+
+  private static Result findNextIdentifier(Lexer lexer, String identifier) {
+    Result result;
+    while ((result = lexer.nextResult()) != null && !result.token().name().equals(identifier)) {
+    }
+    return result;
+  }
+
+  /**
+   * Parse the data of the map
+   * 
+   * @param lexer
+   * @return
+   * @throws IOException
+   */
+  private static String[][] parseData(Lexer lexer, ParsingException pe) {
+    Result result = findNextIdentifier(lexer, "QUOTE");
+    String[] split = result.content().split("\\n");
+    int width = split[1].strip().length(), height = split.length - 2;
+
+    return extractData(split, width, height, new String[height][width], pe);
+  }
+
+  private static String[][] extractData(String[] split, int width, int height, String[][] map, ParsingException pe) {
+    for (int currHeight = 1; currHeight < height + 1; currHeight++) {
+      String s = split[currHeight].strip();
+      if (width != s.length())
+        pe.addException(new IOException("Inconsistent map width : line " + currHeight + " is " + s.length() + " long"));
+      int currWidth = 0;
+
+      for (String tmp2 : s.split("")) {
+        if (!tmp2.equals(" "))
+          map[currHeight - 1][currWidth] = tmp2;
+        currWidth++;
+      }
+    }
+    return map;
+  }
+
+  private static ArrayList<Element> parseElements(Lexer lexer, ParsingException exceptions) {
+    ArrayList<Element> elements = new ArrayList<>();
+    Result result;
+    while ((result = lexer.nextResult()) != null && result.content().equals("[element]")) {
+      Element element = parseElement(lexer, exceptions);
+      elements.add(element);
+      lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
+    }
+    return elements;
+  }
+
+  private static WorldMap parseMap(String[][] data, Map<String, String> encodings) {
+    Encoding encoding = new Encoding(encodings);
+    return WorldMap.interpretMap(data, encoding);
+  }
+
+  private static Player separateElements(List<Element> elements, ArrayList<Enemy> enemies, ArrayList<Item> items,
+      ArrayList<Obstacle> obstacles, ParsingException pe) {
+    Player player = null;
+    for (Element element : elements) {
+      switch (element) {
+        case Enemy e -> enemies.add(e);
+        case Item i -> items.add(i);
+        case Obstacle o -> obstacles.add(o);
+        case Player p -> player = p;
+        default -> pe.addException(new IOException("Unknown element"));
+      }
+    }
+    return player;
   }
 
   /**
@@ -92,9 +156,9 @@ public class Parser {
    * @return
    * @throws IOException
    */
-  private static Element parseElement(Lexer lexer) throws IOException {
+  private static Element parseElement(Lexer lexer, ParsingException pe) {
     HashMap<String, String> attributes = new HashMap<String, String>();
-    addAttributes(lexer, attributes);
+    addAttributes(lexer, attributes, pe);
 
     return Element.valueOf(attributes);
   }
@@ -106,17 +170,17 @@ public class Parser {
    * @param attributes
    * @throws IOException
    */
-  private static void addAttributes(Lexer lexer, HashMap<String, String> attributes) throws IOException {
+  private static void addAttributes(Lexer lexer, HashMap<String, String> attributes, ParsingException pe) {
     Result result;
     while ((result = lexer.nextResult()) != null) {
       if (!result.token().name().equals("IDENTIFIER"))
         break;
-      String name = result.content();
-      while ((result = lexer.nextResult()) != null && result.token().name().equals("COLON")) {
-      }
+      String key = result.content();
+      result = findNextIdentifier(lexer, "COLON");
+      result = lexer.nextResult();
       if (result.content().equals(""))
-        throw new IOException("Error while reading element");
-      attributes.put(name, result.content());
+        pe.addException(new IOException("Error while reading element"));
+      attributes.put(key, result.content());
     }
   }
 
@@ -127,80 +191,16 @@ public class Parser {
    * @return
    * @throws IOException
    */
-  private static int[] parseSize(Lexer lexer) throws IOException {
+  private static int[] parseSize(Lexer lexer, ParsingException pe) {
     int[] tmp = { 0, 0 };
     Result result;
     for (int i = 0; i < 2; i++) {
-      while ((result = lexer.nextResult()) != null && !result.token().name().equals("NUMBER")) {
-      }
+      result = findNextIdentifier(lexer, "NUMBER");
       tmp[i] = Integer.parseInt(result.content());
     }
     if (tmp[0] <= 0 || tmp[1] <= 0)
-      throw new IOException("Error while reading size: line " + lexer.line());
+      pe.addException(new IOException("Error while reading size: line " + lexer.line()));
     return tmp;
-  }
-
-  /**
-   * Parse the encodings of the map
-   * 
-   * @param lexer
-   * @return
-   * @throws IOException
-   */
-  private static Map<String, String> parseEncoding(Lexer lexer) throws IOException {
-    HashMap<String, String> encodings = new HashMap<String, String>();
-
-    Result result;
-    while ((result = lexer.nextResult()) != null) {
-      String currentName = result.content();
-      if (result.token().name().equals("IDENTIFIER")) {
-        while ((result = lexer.nextResult()) != null && !result.token().name().equals("IDENTIFIER")) {
-        }
-        var res = encodings.putIfAbsent(result.content(), currentName);
-        if (!(res == null)) {
-          throw new IOException(
-              "Encoding already exist line " + lexer.line() + " : " + result.content() + " -> " + currentName + " and "
-                  + result.content() + " -> " + res);
-        }
-
-      } else if (result.token().name().equals("HEADER") && !result.content().equals("encodings:")) {
-        break;
-      }
-    }
-    return encodings;
-  }
-
-  /**
-   * Parse the data of the map
-   * 
-   * @param lexer
-   * @return
-   * @throws IOException
-   */
-  private static String[][] parseData(Lexer lexer) throws IOException {
-    Result result;
-    while ((result = lexer.nextResult()) != null && !result.token().name().equals("QUOTE")) {
-    }
-    String[] split = result.content().split("\\n");
-    int width = split[1].strip().length(), height = split.length - 2;
-
-    return extractData(split, width, height, new String[height][width]);
-  }
-
-  private static String[][] extractData(String[] split, int width, int height, String[][] map) throws IOException {
-    for (int currHeight = 1; currHeight < height + 1; currHeight++) {
-      String s = split[currHeight].strip();
-      if (width != s.length())
-        throw new IOException("Inconsistent map width : line " + currHeight + " is " + s.length() + " long");
-      int currWidth = 0;
-
-      for (String tmp2 : s.split("")) {
-        if (!tmp2.equals(" "))
-          map[currHeight - 1][currWidth] = tmp2;
-        currWidth++;
-      }
-    }
-    return map;
   }
 
   private static List<Exception> errorCheck(int[] dimensions, Map<String, String> encodings, WorldMap map) {
