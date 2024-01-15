@@ -23,6 +23,10 @@ public class Main {
   static boolean isInventoryVisible = false;
 
   public static void main(String[] args) throws IOException {
+    // javax.swing.SwingUtilities.invokeLater(() -> {});
+    // var test = Image.getImageInJar("ALGAE");
+    // if (test != null)
+    // System.out.println(test);
     final var frequency = 1000 / 60;
     var filePath = Path.of("fun.map");
     final World world;
@@ -94,7 +98,6 @@ public class Main {
           }
         }
         context.exit(0);
-        System.out.println(world);
       });
     } catch (Exception e) {
       e.printStackTrace(); // TODO: Replace with system.err
