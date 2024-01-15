@@ -42,5 +42,24 @@ public record Image(Path path, BufferedImage data) {
     return searchImage(Path.of("resources/images").resolve(type + "_0.gif"));
   }
 
+  /**
+   * Retourne l'image correspondant au type passé en paramètre. Cherche l'image
+   * dans le .jar
+   * 
+   * @param type
+   * @return
+   */
+  public static Image getImageInJar(String type) {
+    InputStream is = Image.class.getResourceAsStream("/images/" + type + "_0.gif");
+    if (is == null) {
+      System.out.println("Image not found " + type + "_0.gif");
+      return null;
+    }
+    try {
+      return new Image(Path.of("images").resolve(type + "_0.gif"), javax.imageio.ImageIO.read(is));
+    } catch (Exception e) {
+      System.err.println("Error while loading image " + type + "_0.gif");
+      return null;
+    }
   }
 }
