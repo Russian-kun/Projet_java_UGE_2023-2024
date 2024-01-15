@@ -93,10 +93,12 @@ public record Display(int caseSize, int shiftX, int shiftY) {
     }
   }
 
-  public void displayInventory(World world, ApplicationContext context, ImageCache cachedImages) {
+  public void displayInventory(World world, ApplicationContext context, ImageCache cachedImages,
+      Position cursorPosition) {
     context.renderFrame(graphics -> {
       drawInventoryRectangle(graphics, context, Color.DARK_GRAY, Color.WHITE, 2.0f);
       drawItemsInInventory(graphics, context, world.player().getInventory(), cachedImages);
+      drawInventoryCursor(graphics, context, cursorPosition);
     });
   }
 
@@ -115,16 +117,61 @@ public record Display(int caseSize, int shiftX, int shiftY) {
     graphics.draw(new Rectangle2D.Float(inventoryX, inventoryY, inventoryWidth, inventoryHeight));
   }
 
-  private void drawItemsInInventory(Graphics2D graphics, ApplicationContext context, List<Item> items,
+  private void drawItemsInInventory(Graphics2D graphics, ApplicationContext context, Inventory items,
       ImageCache cachedImages) {
     float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
     float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
 
-    for (Item item : items) {
+    for (Item item : items.getItems()) {
       Image image = cachedImages.getImage(item);
       graphics.drawImage(image.getData(), (int) inventoryX, (int) inventoryY, (int) caseSize, (int) caseSize, null);
       inventoryX += caseSize + 10;
+      if (inventoryX >= context.getScreenInfo().getWidth() / 2 + 250 - 20) {
+        inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
+        inventoryY += caseSize + 10;
+      }
+  }
+  }
+
+  private void drawInventoryCursor(Graphics2D graphics, ApplicationContext context, Position cursorPosition) {
+    graphics.setColor(Color.RED);
+    float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
+    float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
+    graphics.drawRect(
+        (int) (inventoryX + cursorPosition.getX() * (caseSize + 10)),
+        (int) (inventoryY + cursorPosition.getY() * (caseSize + 10)),
+        (int) caseSize, (int) caseSize);
+  }
+
+  public void interpretKey(ApplicationContext context, Player player, KeyboardKey key, Position cursorPosition) {
+    switch (key) {
+      case UP -> cursorPosition.setY(cursorPosition.getY() <= 0 ? 0 : cursorPosition.getY() - 1);
+      case DOWN -> cursorPosition.setY(cursorPosition.getY() + 1);
+      case LEFT -> cursorPosition.setX(cursorPosition.getX() <= 0 ? 0 : cursorPosition.getX() - 1);
+      case RIGHT -> cursorPosition.setX(cursorPosition.getX() + 1);
+      case SPACE -> {
+        Item item = player.getInventory().getItems().get(cursorPosition.getY() * 5 + cursorPosition.getX());
+        player.getInventory().removeItem(item);
+        player.setHealth(player.getHealth() + item.getHealth());
+      }
+      default -> {
+      }
     }
+    Inventory inventory = player.getInventory();
+    // float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
+    // float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
+    int itemPerLine = (int) (500 / (caseSize + 10)); // here correct value is 15
+    if (itemPerLine == 0)
+      itemPerLine = 1;
+    if (cursorPosition.getX() < 0)
+      cursorPosition.setX(itemPerLine - 1);
+    if (cursorPosition.getX() >= itemPerLine || cursorPosition.getX() >= inventory.size() % itemPerLine)
+      cursorPosition.setX(0);
+    if (cursorPosition.getY() < 0)
+      cursorPosition.setY(inventory.size() / itemPerLine);
+    if (cursorPosition.getY() > inventory.size() / itemPerLine)
+      cursorPosition.setY(0);
+
   }
 
   public void hideInventory(World world, ApplicationContext context, Display show,

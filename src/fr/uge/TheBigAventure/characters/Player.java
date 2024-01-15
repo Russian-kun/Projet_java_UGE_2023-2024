@@ -5,12 +5,14 @@ import java.util.Map;
 
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
+import fr.uge.TheBigAventure.gameObjects.Item.ItemSkin;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
 import fr.umlv.zen5.KeyboardKey;
 
 public class Player extends GameCharacter {
-  private final ArrayList<Item> inventory = new ArrayList<>();
+  private final Inventory inventory = new Inventory(new ArrayList<>());
+  private Item equipedItem = null;
 
   public enum PlayerSkin implements GeneralCharacterSkin {
     BABA(CharacterSkin.BABA),
@@ -25,7 +27,7 @@ public class Player extends GameCharacter {
     }
 
     public CharacterSkin getCharacterSkin() {
-      return this.characterSkin;
+      return characterSkin;
     }
   }
 
@@ -43,15 +45,7 @@ public class Player extends GameCharacter {
         Position.valueOf(attributes.get("position")), Integer.parseInt(attributes.get("health")));
   }
 
-  public void addItem(Item item) {
-    inventory.add(item);
-  }
-
-  public void removeItem(Item item) {
-    inventory.remove(item);
-  }
-
-  public ArrayList<Item> getInventory() {
+  public Inventory getInventory() {
     return inventory;
   }
 
@@ -59,16 +53,25 @@ public class Player extends GameCharacter {
     if (key == null)
       throw new IllegalArgumentException("key must not be null");
     previousPosition = new Position(position.getX(), position.getY());
+    Position newPosition = null;
     boolean moved = false;
     switch (key) {
-      case UP ->
-        moved = moveIfFree(world, position.getX(), position.getY() - 1);
-      case DOWN ->
-        moved = moveIfFree(world, position.getX(), position.getY() + 1);
-      case LEFT ->
-        moved = moveIfFree(world, position.getX() - 1, position.getY());
-      case RIGHT ->
-        moved = moveIfFree(world, position.getX() + 1, position.getY());
+      case UP -> {
+        newPosition = new Position(position.getX(), position.getY() - 1);
+        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
+      }
+      case DOWN -> {
+        newPosition = new Position(position.getX(), position.getY() + 1);
+        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
+      }
+      case LEFT -> {
+        newPosition = new Position(position.getX() - 1, position.getY());
+        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
+      }
+      case RIGHT -> {
+        newPosition = new Position(position.getX() + 1, position.getY());
+        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
+      }
       default ->
         throw new IllegalArgumentException("key must be a movement key");
     }
@@ -76,9 +79,20 @@ public class Player extends GameCharacter {
       Item item = world.getItemPosition(position);
       if (item != null) {
         System.out.println(item.getName());
-        addItem(item);
+        inventory.addItem(item);
         world.removeItemPosition(position);
       }
+      // if door
+    } else if (world.doorAt(newPosition)
+        && inventory.getItems().stream().anyMatch(item -> item.getSkin().equals(ItemSkin.KEY))) {
+      inventory.getItems().stream()
+          .filter(item -> item.getSkin().equals(ItemSkin.KEY))
+          .findFirst()
+          .ifPresent(item -> {
+            inventory.removeItem(item);
+          });
+      world.removeObjectPosition(newPosition);
+      moved = true;
     }
     return moved;
   }
@@ -97,6 +111,16 @@ public class Player extends GameCharacter {
 
   public void takeDamage(int quantity) {
     health -= quantity;
+  }
+
+  public void equipItem(Item item) {
+    if (!inventory.contains(item))
+      throw new IllegalArgumentException("item must be in inventory");
+    equipedItem = item;
+  }
+
+  public void unequipItem() {
+    equipedItem = null;
   }
 
 }
