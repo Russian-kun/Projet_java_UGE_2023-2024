@@ -19,7 +19,10 @@ import fr.uge.TheBigAventure.gameObjects.Weapon;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
 import fr.uge.TheBigAventure.general.WorldMap;
+import fr.uge.TheBigAventure.keys.AcceptedKeys;
 import fr.umlv.zen5.ApplicationContext;
+import fr.umlv.zen5.Event;
+import fr.umlv.zen5.Event.Action;
 import fr.umlv.zen5.KeyboardKey;
 
 /**
@@ -154,6 +157,31 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
     });
   }
 
+  public static void inventoryLoop(final World world, final ImageCache cachedImages, ApplicationContext context,
+      Display display) {
+    Event event;
+    KeyboardKey key;
+    Position cursorPosition = new Position(0, 0);
+    // Afficher l'inventaire
+    display.displayInventory(world, context, cachedImages, cursorPosition);
+
+    while (true) {
+      // event = context.pollEvent();
+      event = context.pollOrWaitEvent(1000 / 30);
+      if (event != null && event.getAction() == Action.KEY_PRESSED) {
+        if (AcceptedKeys.isAcceptedKey(key = event.getKey())) {
+          if (key == KeyboardKey.I || key == KeyboardKey.Q)
+            break;
+          else {
+            display.interpretKey(context, world.player(), key, cursorPosition);
+            display.displayInventory(world, context, cachedImages, cursorPosition);
+          }
+        }
+      }
+    }
+    Display.hideInventory(world, context, display, cachedImages);
+  }
+
   public void displayInventory(World world, ApplicationContext context, ImageCache cachedImages,
       Position cursorPosition) {
     context.renderFrame(graphics -> {
@@ -248,7 +276,7 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
 
   }
 
-  public void hideInventory(World world, ApplicationContext context, Display show,
+  public static void hideInventory(World world, ApplicationContext context, Display show,
       ImageCache cachedImages) {
     context.renderFrame(graphics -> {
       graphics.clearRect(0, 0, (int) context.getScreenInfo().getWidth(), (int) context.getScreenInfo().getHeight());
