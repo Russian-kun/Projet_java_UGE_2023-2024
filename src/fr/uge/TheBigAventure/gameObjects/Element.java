@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import fr.uge.TheBigAventure.characters.Enemy;
 import fr.uge.TheBigAventure.characters.Player;
+import fr.uge.TheBigAventure.food.GeneralFood;
 import fr.uge.TheBigAventure.general.Position;
 
 // Les éléments de la carte sont définie par la section [element] qui définie des sous-sections [element] qui 
@@ -88,6 +89,8 @@ public abstract class Element {
       case "item" -> {
         if (attributes.containsKey("damage"))
           yield Weapon.valueOf(attributes);
+        else if (attributes.containsKey("health"))
+          yield GeneralFood.valueOf(attributes);
         else
           yield Item.valueOf(attributes);
       }

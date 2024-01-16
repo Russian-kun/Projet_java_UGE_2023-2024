@@ -1,18 +1,31 @@
 package fr.uge.TheBigAventure.food;
 
+import fr.uge.TheBigAventure.gameObjects.InventoryObjectSkin;
+import fr.uge.TheBigAventure.general.Position;
+
 public class Food extends GeneralFood {
 
-  public enum FoodType implements GeneralFoodType {
-    BANANA, BOBA, BOTTLE, BURGER, CAKE, CHEESE, DONUT, DRINK, EGG, FRUIT, FUNGUS, FUNGI, LOVE, PIZZA, POTATO, PUMPKIN,
-    TURNIP
+  public enum FoodType implements InventoryObjectSkin {
+    BANANA(GeneralFoodType.BANANA), BOBA(GeneralFoodType.BOBA), BOTTLE(GeneralFoodType.BOTTLE),
+    BURGER(GeneralFoodType.BURGER), CAKE(GeneralFoodType.CAKE), CHEESE(GeneralFoodType.CHEESE),
+    DONUT(GeneralFoodType.DONUT), DRINK(GeneralFoodType.DRINK), EGG(GeneralFoodType.EGG), FRUIT(GeneralFoodType.FRUIT),
+    FUNGUS(GeneralFoodType.FUNGUS), FUNGI(GeneralFoodType.FUNGI), LOVE(GeneralFoodType.LOVE),
+    PIZZA(GeneralFoodType.PIZZA), POTATO(GeneralFoodType.POTATO), PUMPKIN(GeneralFoodType.PUMPKIN),
+    TURNIP(GeneralFoodType.TURNIP);
+
+    private final GeneralFoodType type;
+
+    FoodType(GeneralFoodType skin) {
+      this.type = skin;
+    }
+
+    public GeneralFoodType getFoodSkin() {
+      return type;
+    }
   }
 
-  public Food(FoodType type) {
-    super(type);
-  }
-
-  public FoodType type() {
-    return FoodType.valueOf(type.toString());
+  public Food(String name, FoodType skin, Position position, int health) {
+    super(name, skin.getFoodSkin(), position, health);
   }
 
 }
