@@ -50,19 +50,19 @@ public class Player extends GameCharacter {
   public boolean move(World world, KeyboardKey key) {
     if (key == null)
       throw new IllegalArgumentException("key must not be null");
-    previousPosition = new Position(position.getX(), position.getY());
+    previousPosition = new Position(getPosition().getX(), getPosition().getY());
     Position newPosition = null;
     boolean moved = false;
     switch (key) {
-      case UP -> newPosition = new Position(position.getX(), position.getY() - 1);
-      case DOWN -> newPosition = new Position(position.getX(), position.getY() + 1);
-      case LEFT -> newPosition = new Position(position.getX() - 1, position.getY());
-      case RIGHT -> newPosition = new Position(position.getX() + 1, position.getY());
+      case UP -> newPosition = new Position(getPosition().getX(), getPosition().getY() - 1);
+      case DOWN -> newPosition = new Position(getPosition().getX(), getPosition().getY() + 1);
+      case LEFT -> newPosition = new Position(getPosition().getX() - 1, getPosition().getY());
+      case RIGHT -> newPosition = new Position(getPosition().getX() + 1, getPosition().getY());
       default -> throw new IllegalArgumentException("key must be a movement key");
     }
     moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
     if (moved)
-      getInventory().pickupWorldItem(world, position, newPosition);
+      getInventory().pickupWorldItem(world, getPosition(), newPosition);
     else if (canOpenDoor(world, newPosition)) {
       openDoor(world, newPosition);
       moved = true;

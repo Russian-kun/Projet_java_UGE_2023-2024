@@ -52,32 +52,23 @@ public class GameCharacter extends Element {
   }
 
   public void moveUp() {
-    previousPosition.setY(position.getY());
-    position.setY(position.getY() - 1);
+    previousPosition.setY(getPosition().getY());
+    getPosition().setY(getPosition().getY() - 1);
   }
 
   public void moveDown() {
-    previousPosition.setY(position.getY());
-    position.setY(position.getY() + 1);
+    previousPosition.setY(getPosition().getY());
+    getPosition().setY(getPosition().getY() + 1);
   }
 
   public void moveLeft() {
-    previousPosition.setX(position.getX());
-    position.setX(position.getX() - 1);
+    previousPosition.setX(getPosition().getX());
+    getPosition().setX(getPosition().getX() - 1);
   }
 
   public void moveRight() {
-    previousPosition.setX(position.getX());
-    position.setX(position.getX() + 1);
-  }
-
-  public void moveBack() {
-    var tmp = new Position(position.getX(), position.getY());
-
-    if (previousPosition != null)
-      position = previousPosition;
-    previousPosition.setX(tmp.getX());
-    previousPosition.setY(tmp.getY());
+    previousPosition.setX(getPosition().getX());
+    getPosition().setX(getPosition().getX() + 1);
   }
 
   public Position getPreviousPosition() {
