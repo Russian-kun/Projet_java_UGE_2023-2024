@@ -67,8 +67,7 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
   public boolean doorAt(Position position) {
     var tmp = worldMap.map()[position.getY()][position.getX()];
     return tmp != null
-        // && (tmp.getName().equals("door") || tmp.getName().equals("gate"));
-        && tmp.getSkin().equals(ImpassableType.DOOR) || tmp.getSkin().equals(ImpassableType.GATE);
+        && (tmp.getSkin().equals(ImpassableType.DOOR) || tmp.getSkin().equals(ImpassableType.GATE));
   }
 
   public void removeItemPosition(Position position) {
