@@ -7,6 +7,7 @@ import fr.uge.TheBigAventure.characters.Enemy;
 import fr.uge.TheBigAventure.characters.Player;
 import fr.uge.TheBigAventure.gameObjects.Item;
 import fr.uge.TheBigAventure.gameObjects.Obstacle;
+import fr.uge.TheBigAventure.gameObjects.Obstacle.ImpassableType;
 
 /**
  * Main class of the game, it contains all the information about the world,
@@ -51,12 +52,18 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
 
   public Item getItemPosition(Position position) {
     for (Item item : items) {
-      System.out.println(item.getPosition().getX() + " " + item.getPosition().getY());
       if (item.getPosition().getX() == position.getX() && item.getPosition().getY() == position.getY()) {
         return item;
       }
     }
     return null;
+  }
+
+  public boolean doorAt(Position position) {
+    var tmp = worldMap.map()[position.getY()][position.getX()];
+    return tmp != null
+        // && (tmp.getName().equals("door") || tmp.getName().equals("gate"));
+        && tmp.getSkin().equals(ImpassableType.DOOR) || tmp.getSkin().equals(ImpassableType.GATE);
   }
 
   public void removeItemPosition(Position position) {
@@ -66,6 +73,10 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
         return;
       }
     }
+  }
+
+  public void removeObjectPosition(Position position) {
+    worldMap.map()[position.getY()][position.getX()] = null;
   }
 
 }
