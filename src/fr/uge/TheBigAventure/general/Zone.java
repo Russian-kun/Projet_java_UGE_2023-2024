@@ -12,6 +12,14 @@ public class Zone {
     this.height = height;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Zone))
+      return false;
+    Zone zone = (Zone) obj;
+    return topLeft.equals(zone.topLeft) && width == zone.width && height == zone.height;
+  }
+
   public static Zone valueOf(String zone) {
     // "(38, 24) (10 x 8)"
     String[] tot = zone.split("\\) *\\(");
