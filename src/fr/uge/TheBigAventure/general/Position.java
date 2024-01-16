@@ -39,6 +39,10 @@ public class Position {
     return y;
   }
 
+  public int distance(Position position) {
+    return Math.abs(x - position.x) + Math.abs(y - position.y);
+  }
+
   public void setX(int x) {
     if (x < 0)
       throw new IllegalArgumentException("x must be positive");
