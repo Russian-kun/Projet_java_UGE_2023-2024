@@ -60,15 +60,8 @@ public record Display(int caseSize, int shiftX, int shiftY) {
     drawList(graphics, display, cachedImages, world.enemies());
   }
 
-  public static void drawWorldMap(Graphics2D graphics, Display display, ImageCache cachedImages, WorldMap worldMap) {
-    for (int y = 0; y < worldMap.height(); y++) {
-      for (int x = 0; x < worldMap.width(); x++) {
-        if (worldMap.map()[y][x] != null) {
-          // We will look for the corresponding image in the images folder if it is not
-          // not already in cache
-          // The images are named as follows: NAME_0.webp
-          drawElement(graphics, display, cachedImages, worldMap.map()[y][x]);
-        }
+    if (world.player().getHealth() < world.player().getMaxHealth())
+      drawHealthBar(graphics, world.player());
       }
     }
   }
@@ -209,6 +202,20 @@ public record Display(int caseSize, int shiftX, int shiftY) {
       graphics.setColor(Color.WHITE);
       Display.drawWorld(graphics, show, cachedImages, world);
     });
+  }
+
+  private static void drawHealthBar(Graphics2D graphics, Player player) {
+    int healthBarX = 20;
+    int healthBarY = 20;
+    int healthBarWidth = 100;
+    int healthBarHeight = 10;
+    graphics.setColor(Color.GRAY);
+    graphics.fill(new Rectangle2D.Float(healthBarX - 1, healthBarY - 1, healthBarWidth + 1, healthBarHeight + 1));
+    graphics.setColor(Color.WHITE);
+    graphics.drawRect(healthBarX - 1, healthBarY - 1, healthBarWidth + 1, healthBarHeight + 1);
+    graphics.setColor(Color.RED);
+    graphics.fill(new Rectangle2D.Float(healthBarX, healthBarY,
+        healthBarWidth * (player.getHealth() / player.getMaxHealth()), healthBarHeight));
   }
 
 }
