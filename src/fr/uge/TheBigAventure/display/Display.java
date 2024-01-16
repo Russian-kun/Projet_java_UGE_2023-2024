@@ -26,7 +26,7 @@ import fr.umlv.zen5.KeyboardKey;
  * Classe permettant de calculer et stocker les dimensions de divers éléments de
  * l'interface graphique.
  */
-public record Display(int caseSize, int shiftX, int shiftY) {
+public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
 
   public Display {
     if (caseSize <= 0) {
@@ -41,10 +41,11 @@ public record Display(int caseSize, int shiftX, int shiftY) {
   }
 
   public static Display createDisplay(int worldWidth, int worldHeight, int screenWidth, int screenHeight) {
-    int caseSize = min(screenWidth / worldWidth, screenHeight / worldHeight);
-    int shiftX = (screenWidth - worldWidth * caseSize) / 2;
-    int shiftY = (screenHeight - worldHeight * caseSize) / 2;
-    return new Display(caseSize, shiftX, shiftY);
+    int viewSize = 11;
+    int caseSize = max(min(screenWidth / viewSize, screenHeight / viewSize), 24); // min(, 24)
+    int shiftX = max((screenWidth - viewSize * caseSize) / 2, 0);
+    int shiftY = max((screenHeight - viewSize * caseSize) / 2, 0);
+    return new Display(caseSize, shiftX, shiftY, viewSize);
   }
 
   public static void drawWorld(Graphics2D graphics, Display display, ImageCache cachedImages, World world) {
@@ -53,31 +54,81 @@ public record Display(int caseSize, int shiftX, int shiftY) {
       clearPreviousPosition(graphics, display, world.enemies().get(i));
     }
 
-    drawWorldMap(graphics, display, cachedImages, world.worldMap());
-    drawElement(graphics, display, cachedImages, world.player());
-    drawList(graphics, display, cachedImages, world.obstacles());
-    drawList(graphics, display, cachedImages, world.items());
-    drawList(graphics, display, cachedImages, world.enemies());
-  }
+    Position center = getCenter(display, world);
 
+    drawCenteredWorldMap(graphics, display, cachedImages, world.worldMap(), center);
+    drawCenteredList(graphics, display, cachedImages, world.obstacles(), center);
+    drawCenteredList(graphics, display, cachedImages, world.items(), center);
+    drawCenteredList(graphics, display, cachedImages, world.enemies(), center);
+
+    drawCenteredElement(graphics, display, cachedImages, world.player(), center);
+    if (world.player().getWeapon() != null)
+      drawEquipedItem(graphics, display, cachedImages, world.player().getWeapon(), center);
     if (world.player().getHealth() < world.player().getMaxHealth())
       drawHealthBar(graphics, world.player());
+  }
+
+  private static Position getCenter(Display display, World world) {
+    Position center = Position.getPositionCopy(world.player().getPosition());
+    if (center.getX() - ((display.viewSize() - 1) / 2) <= 0)
+      center.setX((display.viewSize() - 1) / 2);
+    else if (center.getX() + ((display.viewSize() - 1) / 2) >= world.worldMap().width())
+      center.setX(world.worldMap().width() - ((display.viewSize() - 1) / 2));
+    if (center.getY() - ((display.viewSize() - 1) / 2) <= 0)
+      center.setY((display.viewSize() - 1) / 2);
+    else if (center.getY() + ((display.viewSize() - 1) / 2) >= world.worldMap().height())
+      center.setY(world.worldMap().height() - ((display.viewSize() - 1) / 2));
+    return center;
+  }
+
+  private static void drawCenteredWorldMap(Graphics2D graphics, Display display, ImageCache cachedImages,
+      WorldMap worldMap, Position center) {
+    int x = (int) center.getX(), y = (int) center.getY();
+    int width = worldMap.width(), height = worldMap.height();
+    int xMin = max(0, x - (display.viewSize - 1) / 2), xMax = min(width, x + (display.viewSize - 1) / 2 + 1);
+    int yMin = max(0, y - (display.viewSize - 1) / 2), yMax = min(height, y + (display.viewSize - 1) / 2 + 1);
+    for (int i = yMin; i < yMax; i++) {
+      for (int j = xMin; j < xMax; j++) {
+        if (worldMap.map()[i][j] != null) {
+          drawCenteredElement(graphics, display, cachedImages, worldMap.map()[i][j], center);
+        }
       }
     }
   }
 
-  private static <T> void drawList(Graphics2D graphics, Display display, ImageCache cachedImages, List<T> list) {
+  private static <T> void drawCenteredList(Graphics2D graphics, Display display, ImageCache cachedImages, List<T> list,
+      Position center) {
     for (int i = 0; i < list.size(); i++) {
-      drawElement(graphics, display, cachedImages, (Element) list.get(i));
+      Element tmp = (Element) list.get(i);
+      if (isInView(center, tmp, display))
+        drawCenteredElement(graphics, display, cachedImages, tmp, center);
     }
   }
 
-  private static void drawElement(Graphics2D graphics, Display display, ImageCache cachedImages,
-      Element element) {
+  private static void drawCenteredElement(Graphics2D graphics, Display display, ImageCache cachedImages,
+      Element element, Position center) {
     Image image = cachedImages.getImage(element);
     graphics.drawImage(image.getData(),
-        (int) (element.getPosition().getX() * display.caseSize() + display.shiftX()),
-        (int) (element.getPosition().getY() * display.caseSize() + display.shiftY()),
+        (int) ((element.getPosition().getX() - center.getX() + ((display.viewSize() - 1) / 2)) * display.caseSize()
+            + display.shiftX()),
+        (int) ((element.getPosition().getY() - center.getY() + ((display.viewSize() - 1) / 2)) * display.caseSize()
+            + display.shiftY()),
+        display.caseSize(),
+        display.caseSize(),
+        null);
+  }
+
+  private static void drawEquipedItem(Graphics2D graphics, Display display, ImageCache cachedImages, Element item,
+      Position center) {
+    // L'item doit etre decalé par rapport au joueur et incliné (comme une épée)
+    Image image = cachedImages.getImage(item);
+    graphics.drawImage(image.rotatedData(-30),
+        (int) ((item.getPosition().getX() - center.getX() + ((display.viewSize() - 1) / 2)) * display.caseSize()
+            + display.shiftX() + display.caseSize() / 3),
+        (int) ((item.getPosition().getY() - center.getY() + ((display.viewSize() - 1) / 2)) * display.caseSize()
+            + display.shiftY() + display.caseSize() / 8),
+        display.caseSize(),
+        display.caseSize(),
         null);
   }
 
@@ -128,28 +179,31 @@ public record Display(int caseSize, int shiftX, int shiftY) {
 
   private void drawItemsInInventory(Graphics2D graphics, ApplicationContext context, Inventory items,
       ImageCache cachedImages) {
-    float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
-    float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
+    int inventoryX = (int) (context.getScreenInfo().getWidth() / 2 - 250 + 20), resetX = inventoryX;
+    int inventoryY = (int) (context.getScreenInfo().getHeight() / 2 - 250 + 20);
 
+    int inventoryCaseSize = 24;
     for (Item item : items.getItems()) {
       Image image = cachedImages.getImage(item);
-      graphics.drawImage(image.getData(), (int) inventoryX, (int) inventoryY, (int) caseSize, (int) caseSize, null);
-      inventoryX += caseSize + 10;
+      graphics.drawImage(image.getData(), inventoryX, inventoryY, inventoryCaseSize, inventoryCaseSize, null);
+      inventoryX += inventoryCaseSize + 10;
       if (inventoryX >= context.getScreenInfo().getWidth() / 2 + 250 - 20) {
-        inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
-        inventoryY += caseSize + 10;
+        inventoryX = resetX;
+        inventoryY += inventoryCaseSize + 10;
       }
     }
   }
 
   private void drawInventoryCursor(Graphics2D graphics, ApplicationContext context, Position cursorPosition) {
     graphics.setColor(Color.RED);
-    float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
-    float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
+    int inventoryX = (int) (context.getScreenInfo().getWidth() / 2 - 250 + 20);
+    int inventoryY = (int) (context.getScreenInfo().getHeight() / 2 - 250 + 20);
+
+    int inventoryCaseSize = 24;
     graphics.drawRect(
-        (int) (inventoryX + cursorPosition.getX() * (caseSize + 10)),
-        (int) (inventoryY + cursorPosition.getY() * (caseSize + 10)),
-        (int) caseSize, (int) caseSize);
+        inventoryX + cursorPosition.getX() * (inventoryCaseSize + 10),
+        inventoryY + cursorPosition.getY() * (inventoryCaseSize + 10),
+        inventoryCaseSize, inventoryCaseSize);
   }
 
   public void interpretKey(ApplicationContext context, Player player, KeyboardKey key, Position cursorPosition) {
@@ -179,9 +233,7 @@ public record Display(int caseSize, int shiftX, int shiftY) {
       }
     }
     Inventory inventory = player.getInventory();
-    // float inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
-    // float inventoryY = context.getScreenInfo().getHeight() / 2 - 250 + 20;
-    int itemPerLine = (int) (500 / (caseSize + 10)); // here correct value is 15
+    int itemPerLine = (int) (500 / (24 + 10));
     if (itemPerLine == 0)
       itemPerLine = 1;
     if (cursorPosition.getX() < 0)
@@ -202,6 +254,22 @@ public record Display(int caseSize, int shiftX, int shiftY) {
       graphics.setColor(Color.WHITE);
       Display.drawWorld(graphics, show, cachedImages, world);
     });
+  }
+
+  private static boolean isInView(Position center, Element tmp, Display display) {
+    return tmp.getPosition().getX() >= center.getX() - ((display.viewSize() - 1) / 2)
+        && tmp.getPosition().getX() <= center.getX() + ((display.viewSize() - 1) / 2)
+        && tmp.getPosition().getY() >= center.getY() - ((display.viewSize() - 1) / 2)
+        && tmp.getPosition().getY() <= center.getY() + ((display.viewSize() - 1) / 2);
+  }
+
+  public static void clearScreen(Graphics2D graphics, ApplicationContext context, Display display) {
+    graphics.clearRect(
+        display.shiftX(),
+        display.shiftY(),
+        display.caseSize() * display.viewSize(),
+        display.caseSize() * display.viewSize());
+
   }
 
   private static void drawHealthBar(Graphics2D graphics, Player player) {

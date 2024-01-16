@@ -91,6 +91,7 @@ public class Main {
           }
           context.renderFrame(graphics -> {
             graphics.setColor(Color.WHITE);
+            Display.clearScreen(graphics, context, display);
             Display.drawWorld(graphics, display, cachedImages, world);
           });
           end = LocalTime.now().toNanoOfDay();
