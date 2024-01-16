@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.uge.TheBigAventure.characters.Enemy;
+import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.characters.Player;
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
@@ -40,7 +41,8 @@ public class Parser {
     ArrayList<Enemy> enemies = new ArrayList<>();
     ArrayList<Item> items = new ArrayList<>();
     ArrayList<Obstacle> obstacles = new ArrayList<>();
-    Player player = separateElements(foundElements, enemies, items, obstacles, exceptions);
+    ArrayList<Friend> friends = new ArrayList<>();
+    Player player = separateElements(foundElements, enemies, friends, items, obstacles, exceptions);
 
     Encoding encoding = new Encoding(encodings);
     exceptions.addAllException(errorCheck(dimensions, encodings, map));
@@ -48,7 +50,7 @@ public class Parser {
       System.err.println(exceptions);
       return null;
     }
-    return new World(player, map, encoding, enemies, items, obstacles);
+    return new World(player, map, encoding, enemies, friends, items, obstacles);
   }
 
   /**
@@ -134,8 +136,8 @@ public class Parser {
     return WorldMap.interpretMap(data, encoding);
   }
 
-  private static Player separateElements(List<Element> elements, ArrayList<Enemy> enemies, ArrayList<Item> items,
-      ArrayList<Obstacle> obstacles, ParsingException pe) {
+  private static Player separateElements(List<Element> elements, ArrayList<Enemy> enemies, ArrayList<Friend> friends,
+      ArrayList<Item> items, ArrayList<Obstacle> obstacles, ParsingException pe) {
     Player player = null;
     for (Element element : elements) {
       switch (element) {
@@ -143,7 +145,8 @@ public class Parser {
         case Item i -> items.add(i);
         case Obstacle o -> obstacles.add(o);
         case Player p -> player = p;
-        default -> pe.addException(new IOException("Unknown element"));
+        case Friend f -> friends.add(f);
+        default -> pe.addException(new IOException("Unknown element : " + element.getSkin()));
       }
     }
     return player;

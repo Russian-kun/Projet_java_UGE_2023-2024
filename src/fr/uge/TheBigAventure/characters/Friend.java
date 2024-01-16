@@ -3,6 +3,7 @@ package fr.uge.TheBigAventure.characters;
 import java.util.Map;
 
 import fr.uge.TheBigAventure.general.Position;
+import fr.uge.TheBigAventure.general.World;
 
 public class Friend extends GameCharacter {
 
@@ -20,4 +21,8 @@ public class Friend extends GameCharacter {
         Integer.parseInt(attributes.get("health")));
   }
 
+  public boolean update(World world) {
+    // TODO
+    return false;
+  }
 }

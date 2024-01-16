@@ -25,7 +25,8 @@ public class Enemy extends GameCharacter {
   public enum Behavior {
     SHY,
     STROLL,
-    AGRESSIVE
+    AGRESSIVE;
+
   }
 
   public Enemy(String name, CharacterSkin skin, Position position, int health, Zone zone, String behavior, int damage) {
@@ -67,5 +68,14 @@ public class Enemy extends GameCharacter {
 
   public Behavior getBehavior() {
     return behavior;
+  }
+  public boolean update(World world) {
+    Position previousPosition = new Position(getPosition().getX(), getPosition().getY());
+    if (world.player().getPosition().distance(getPosition()) <= 5) {
+      activeBehavior(this, world.player());
+    } else {
+      passiveBehavior(this);
+    }
+    return previousPosition.getX() != getPosition().getX() || previousPosition.getY() != getPosition().getY();
   }
 }

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.uge.TheBigAventure.characters.Enemy;
+import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.characters.Player;
 import fr.uge.TheBigAventure.food.GeneralFood;
 import fr.uge.TheBigAventure.general.Position;
@@ -44,7 +45,7 @@ import fr.uge.TheBigAventure.general.Position;
 public abstract class Element {
   public final GeneralSkin skin;
   public final Kind kind;
-  public Position position;
+  private Position position;
 
   public enum Kind {
     PLAYER,
@@ -96,6 +97,7 @@ public abstract class Element {
       }
       case "obstacle" -> Obstacle.valueOf(attributes);
       case "enemy" -> Enemy.valueOf(attributes);
+      case "friend" -> Friend.valueOf(attributes);
       default -> throw new IllegalArgumentException("Unknown element");
     };
   }

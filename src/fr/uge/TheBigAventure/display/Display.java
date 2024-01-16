@@ -60,6 +60,7 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
     drawCenteredList(graphics, display, cachedImages, world.obstacles(), center);
     drawCenteredList(graphics, display, cachedImages, world.items(), center);
     drawCenteredList(graphics, display, cachedImages, world.enemies(), center);
+    drawCenteredList(graphics, display, cachedImages, world.friends(), center);
 
     drawCenteredElement(graphics, display, cachedImages, world.player(), center);
     if (world.player().getWeapon() != null)
