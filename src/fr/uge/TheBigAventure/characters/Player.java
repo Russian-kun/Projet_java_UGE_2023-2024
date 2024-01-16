@@ -66,6 +66,16 @@ public class Player extends GameCharacter {
     else if (canOpenDoor(world, newPosition)) {
       openDoor(world, newPosition);
       moved = true;
+    } else {
+      Enemy enemy;
+      Friend friend;
+      if ((enemy = world.enemyAt(newPosition)) != null) {
+        attack(enemy, world);
+        moved = true;
+      } else if ((friend = world.friendAt(newPosition)) != null) {
+        friend.update(world);
+        moved = true;
+      }
     }
 
     return moved;
@@ -91,12 +101,14 @@ public class Player extends GameCharacter {
   }
 
   public boolean moveIfFree(World world, int x, int y) {
-    return Position.moveIfFree(world, position, x, y);
+    return Position.moveIfFree(world, getPosition(), x, y);
   }
 
-  public void attack(Enemy enemy) {
+  public void attack(Enemy enemy, World world) {
     int damage = equipedItem == null ? 1 : equipedItem.getDamage();
-    enemy.setHealth(enemy.getHealth() - damage);
+    enemy.takeDamage(damage);
+    if (enemy.getHealth() <= 0)
+      Enemy.die(enemy, world);
   }
 
   public void heal(int quantity) {
