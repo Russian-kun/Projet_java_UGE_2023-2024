@@ -5,6 +5,7 @@ import java.util.Map;
 
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
+import fr.uge.TheBigAventure.gameObjects.Weapon;
 import fr.uge.TheBigAventure.gameObjects.Item.ItemSkin;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
@@ -12,7 +13,7 @@ import fr.umlv.zen5.KeyboardKey;
 
 public class Player extends GameCharacter {
   private final Inventory inventory = new Inventory(new ArrayList<>());
-  private Item equipedItem = null;
+  private Weapon equipedItem = null;
 
   public enum PlayerSkin implements GeneralCharacterSkin {
     BABA(CharacterSkin.BABA),
@@ -99,7 +100,8 @@ public class Player extends GameCharacter {
   }
 
   public void attack(Enemy enemy) {
-    enemy.setHealth(enemy.getHealth() - 1);
+    int damage = equipedItem == null ? 1 : equipedItem.getDamage();
+    enemy.setHealth(enemy.getHealth() - damage);
   }
 
   public void heal(int quantity) {
@@ -113,7 +115,7 @@ public class Player extends GameCharacter {
   public void equipItem(Item item) {
     if (!inventory.contains(item))
       throw new IllegalArgumentException("item must be in inventory");
-    equipedItem = item;
+    equipedItem = (Weapon) item;
   }
 
   public void unequipItem() {
