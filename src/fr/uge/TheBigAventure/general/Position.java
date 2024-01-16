@@ -50,4 +50,8 @@ public class Position {
       throw new IllegalArgumentException("y must be positive");
     this.y = y;
   }
+
+  public static Position getPositionCopy(Position position) {
+    return new Position(position.getX(), position.getY());
+  }
 }
