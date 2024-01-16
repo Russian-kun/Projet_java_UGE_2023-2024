@@ -36,7 +36,6 @@ public record Inventory(ArrayList<Item> items) {
   public void pickupWorldItem(World world, Position player, Position position) {
     Item item = world.getItemPosition(position);
     if (item != null) {
-      System.out.println(item.getName());
       item.setPosition(player);
       addItem(item);
       world.removeItemPosition(position);
