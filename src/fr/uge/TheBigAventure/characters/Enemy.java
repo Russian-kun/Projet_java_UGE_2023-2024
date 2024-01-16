@@ -29,7 +29,7 @@ public class Enemy extends GameCharacter {
   }
 
   public Enemy(String name, CharacterSkin skin, Position position, int health, Zone zone, String behavior, int damage) {
-    super(name, skin, health, position, Element.Kind.ENEMY);
+    super(name, skin, health, health, position, Element.Kind.ENEMY);
     if (damage < 0)
       throw new IllegalArgumentException("damage must be positive");
     if (zone == null)

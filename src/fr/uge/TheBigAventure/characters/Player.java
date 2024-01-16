@@ -31,11 +31,8 @@ public class Player extends GameCharacter {
     }
   }
 
-  // Constructeur
   public Player(String name, PlayerSkin skin, Position position, int health) {
-    super(name, skin.getCharacterSkin(), health, position, Element.Kind.PLAYER);
-    if (health < 0)
-      throw new IllegalArgumentException("health must be positive");
+    super(name, skin.getCharacterSkin(), health, health, position, Element.Kind.PLAYER);
   }
 
   public static Player valueOf(Map<String, String> attributes) {
