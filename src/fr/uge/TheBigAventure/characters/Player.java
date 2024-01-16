@@ -62,7 +62,7 @@ public class Player extends GameCharacter {
     }
     moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
     if (moved)
-      getWorldItem(world);
+      getInventory().pickupWorldItem(world, position, newPosition);
     else if (canOpenDoor(world, newPosition)) {
       openDoor(world, newPosition);
       moved = true;
@@ -83,16 +83,6 @@ public class Player extends GameCharacter {
         .ifPresent(item -> {
           inventory.removeItem(item);
         });
-  }
-
-  private void getWorldItem(World world) {
-    Item item = world.getItemPosition(position);
-    if (item != null) {
-      System.out.println(item.getName());
-      item.setPosition(getPosition());
-      inventory.addItem(item);
-      world.removeItemPosition(position);
-    }
   }
 
   private boolean canOpenDoor(World world, Position newPosition) {

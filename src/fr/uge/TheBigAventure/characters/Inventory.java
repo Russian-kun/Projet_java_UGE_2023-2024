@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import fr.uge.TheBigAventure.gameObjects.Item;
+import fr.uge.TheBigAventure.general.Position;
+import fr.uge.TheBigAventure.general.World;
 
 public record Inventory(ArrayList<Item> items) {
 
@@ -31,4 +33,13 @@ public record Inventory(ArrayList<Item> items) {
     return items.size();
   }
 
+  public void pickupWorldItem(World world, Position player, Position position) {
+    Item item = world.getItemPosition(position);
+    if (item != null) {
+      System.out.println(item.getName());
+      item.setPosition(player);
+      addItem(item);
+      world.removeItemPosition(position);
+    }
+  }
 }
