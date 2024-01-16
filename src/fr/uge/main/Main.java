@@ -27,6 +27,7 @@ public class Main {
     final var frequency = 1000 / 60;
     var filePath = Path.of("fun.map");
     final World world;
+    final int characterMoveCooldown = 1000 / 2;
     try {
       world = Parser.readMap(filePath);
       if (world == null) {
@@ -46,18 +47,20 @@ public class Main {
             (int) context.getScreenInfo().getWidth(),
             (int) context.getScreenInfo().getHeight());
 
+        boolean moved = true;
+        var cooldown = 0;
         Event event = null;
         var start = LocalTime.now().toNanoOfDay();
         var end = LocalTime.now().toNanoOfDay();
         var delta = (end - start) / 1000000;
         while (true) {
           start = LocalTime.now().toNanoOfDay();
-          event = context.pollEvent();
+          event = context.pollOrWaitEvent(characterMoveCooldown);
           KeyboardKey key = null;
           if (event != null && event.getAction() == Action.KEY_PRESSED) {
             if (AcceptedKeys.isMovementKey((key = event.getKey()))) {
-              if (world.player().move(world, key))
-                Display.clearPosition(context, display, world.player().position);
+              if ((moved = world.player().move(world, key)))
+                Display.clearPosition(context, display, world.player().getPosition());
             }
 
             else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
@@ -89,11 +92,19 @@ public class Main {
             }
             event = null;
           }
-          context.renderFrame(graphics -> {
-            graphics.setColor(Color.WHITE);
-            Display.clearScreen(graphics, context, display);
-            Display.drawWorld(graphics, display, cachedImages, world);
-          });
+          if ((cooldown += (LocalTime.now().toNanoOfDay() - start) / 1000000) > characterMoveCooldown) {
+            moved = moved || world.update();
+            cooldown = 0;
+          }
+
+          if (moved) {
+            context.renderFrame(graphics -> {
+              graphics.setColor(Color.WHITE);
+              Display.clearScreen(graphics, context, display);
+              Display.drawWorld(graphics, display, cachedImages, world);
+
+            });
+          }
           end = LocalTime.now().toNanoOfDay();
           delta = (end - start) / 1000000;
           if (delta < frequency) {
@@ -103,6 +114,7 @@ public class Main {
               System.err.println(e.getMessage());
             }
           }
+          moved = false;
         }
         context.exit(0);
       });
