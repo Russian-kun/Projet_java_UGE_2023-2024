@@ -69,6 +69,13 @@
   damage: 15
 
 [element]
+  name: foodTest
+  skin: BURGER
+  position: (6,7)
+  kind: item
+  health: 5
+
+[element]
   name: key
   skin: KEY
   position: (63,8)
@@ -210,5 +217,3 @@
   skin: BED
   position: (44,45)
   kind: obstacle
-
-
