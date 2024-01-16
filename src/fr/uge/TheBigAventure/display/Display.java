@@ -168,7 +168,12 @@ public record Display(int caseSize, int shiftX, int shiftY) {
       case SPACE -> {
         Item item = player.getInventory().getItems().get(cursorPosition.getY() * 5 + cursorPosition.getX());
         switch (item) {
-          case Weapon w -> player.equipItem(item);
+          case Weapon w -> {
+            if (player.getWeapon() != w)
+              player.equipItem(item);
+            else
+              player.unequipItem();
+          }
           case GeneralFood f -> {
             player.getInventory().removeItem(item);
             player.setHealth(max(player.getHealth() + f.getHealth(), player.getMaxHealth()));

@@ -89,6 +89,7 @@ public class Player extends GameCharacter {
     Item item = world.getItemPosition(position);
     if (item != null) {
       System.out.println(item.getName());
+      item.setPosition(getPosition());
       inventory.addItem(item);
       world.removeItemPosition(position);
     }
@@ -124,6 +125,10 @@ public class Player extends GameCharacter {
 
   public void unequipItem() {
     equipedItem = null;
+  }
+
+  public Weapon getWeapon() {
+    return equipedItem;
   }
 
 }
