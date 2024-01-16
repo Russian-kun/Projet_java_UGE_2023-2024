@@ -1,5 +1,6 @@
 package fr.uge.TheBigAventure.display;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.awt.BasicStroke;
@@ -9,12 +10,17 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import fr.uge.TheBigAventure.characters.GameCharacter;
+import fr.uge.TheBigAventure.characters.Inventory;
+import fr.uge.TheBigAventure.characters.Player;
+import fr.uge.TheBigAventure.food.GeneralFood;
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
+import fr.uge.TheBigAventure.gameObjects.Weapon;
 import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
 import fr.uge.TheBigAventure.general.WorldMap;
 import fr.umlv.zen5.ApplicationContext;
+import fr.umlv.zen5.KeyboardKey;
 
 /**
  * Classe permettant de calculer et stocker les dimensions de divers éléments de
@@ -140,7 +146,7 @@ public record Display(int caseSize, int shiftX, int shiftY) {
         inventoryX = context.getScreenInfo().getWidth() / 2 - 250 + 20;
         inventoryY += caseSize + 10;
       }
-  }
+    }
   }
 
   private void drawInventoryCursor(Graphics2D graphics, ApplicationContext context, Position cursorPosition) {
