@@ -54,45 +54,49 @@ public class Player extends GameCharacter {
     Position newPosition = null;
     boolean moved = false;
     switch (key) {
-      case UP -> {
-        newPosition = new Position(position.getX(), position.getY() - 1);
-        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
-      }
-      case DOWN -> {
-        newPosition = new Position(position.getX(), position.getY() + 1);
-        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
-      }
-      case LEFT -> {
-        newPosition = new Position(position.getX() - 1, position.getY());
-        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
-      }
-      case RIGHT -> {
-        newPosition = new Position(position.getX() + 1, position.getY());
-        moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
-      }
-      default ->
-        throw new IllegalArgumentException("key must be a movement key");
+      case UP -> newPosition = new Position(position.getX(), position.getY() - 1);
+      case DOWN -> newPosition = new Position(position.getX(), position.getY() + 1);
+      case LEFT -> newPosition = new Position(position.getX() - 1, position.getY());
+      case RIGHT -> newPosition = new Position(position.getX() + 1, position.getY());
+      default -> throw new IllegalArgumentException("key must be a movement key");
     }
-    if (moved) {
-      Item item = world.getItemPosition(position);
-      if (item != null) {
-        System.out.println(item.getName());
-        inventory.addItem(item);
-        world.removeItemPosition(position);
-      }
-      // if door
-    } else if (world.doorAt(newPosition)
-        && inventory.getItems().stream().anyMatch(item -> item.getSkin().equals(ItemSkin.KEY))) {
-      inventory.getItems().stream()
-          .filter(item -> item.getSkin().equals(ItemSkin.KEY))
-          .findFirst()
-          .ifPresent(item -> {
-            inventory.removeItem(item);
-          });
-      world.removeObjectPosition(newPosition);
+    moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
+    if (moved)
+      getWorldItem(world);
+    else if (canOpenDoor(world, newPosition)) {
+      openDoor(world, newPosition);
       moved = true;
     }
+
     return moved;
+  }
+
+  private void openDoor(World world, Position newPosition) {
+    removeFirstItem(ItemSkin.KEY);
+    world.removeObjectPosition(newPosition);
+  }
+
+  private void removeFirstItem(ItemSkin itemSkin) {
+    inventory.getItems().stream()
+        .filter(item -> item.getSkin().equals(itemSkin))
+        .findFirst()
+        .ifPresent(item -> {
+          inventory.removeItem(item);
+        });
+  }
+
+  private void getWorldItem(World world) {
+    Item item = world.getItemPosition(position);
+    if (item != null) {
+      System.out.println(item.getName());
+      inventory.addItem(item);
+      world.removeItemPosition(position);
+    }
+  }
+
+  private boolean canOpenDoor(World world, Position newPosition) {
+    return world.doorAt(newPosition)
+        && inventory.getItems().stream().anyMatch(item -> item.getSkin().equals(ItemSkin.KEY));
   }
 
   public boolean moveIfFree(World world, int x, int y) {
