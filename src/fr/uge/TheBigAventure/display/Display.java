@@ -270,7 +270,6 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
         display.shiftY(),
         display.caseSize() * display.viewSize(),
         display.caseSize() * display.viewSize());
-
   }
 
   private static void drawHealthBar(Graphics2D graphics, Player player) {
