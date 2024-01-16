@@ -54,22 +54,31 @@ public class Main {
           event = context.pollEvent();
           KeyboardKey key = null;
           if (event != null && event.getAction() == Action.KEY_PRESSED) {
-            if (AcceptedKeys.isMovementKey((key = event.getKey())))
-              world.player().move(world, key);
+            if (AcceptedKeys.isMovementKey((key = event.getKey()))) {
+              if (world.player().move(world, key))
+                Display.clearPosition(context, display, world.player().position);
+            }
 
             else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
               isInventoryVisible = true;
+              Position cursorPosition = new Position(0, 0);
               // Afficher l'inventaire
-              display.displayInventory(world, context, cachedImages);
-              int pressCount = 0;
+              display.displayInventory(world, context, cachedImages, cursorPosition);
 
-              do {
-                event = context.pollEvent();
-                if (event != null && event.getKey() == KeyboardKey.I) {
-                  pressCount++;
+              while (true) {
+                // event = context.pollEvent();
+                event = context.pollOrWaitEvent(1000 / 30);
+                if (event != null && event.getAction() == Action.KEY_PRESSED) {
+                  if (AcceptedKeys.isAcceptedKey(key = event.getKey())) {
+                    if (key == KeyboardKey.I || key == KeyboardKey.Q)
+                      break;
+                    else {
+                      display.interpretKey(context, world.player(), key, cursorPosition);
+                      display.displayInventory(world, context, cachedImages, cursorPosition);
+                    }
+                  }
                 }
-              } while (pressCount < 2);
-
+              }
               // Cacher l'inventaire
               isInventoryVisible = false;
               display.hideInventory(world, context, display, cachedImages);

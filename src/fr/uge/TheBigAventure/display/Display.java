@@ -93,6 +93,16 @@ public record Display(int caseSize, int shiftX, int shiftY) {
     }
   }
 
+  public static void clearPosition(ApplicationContext context, Display display, Position position) {
+    context.renderFrame(graphics -> {
+      graphics.clearRect(
+          (int) (position.getX() * display.caseSize() + display.shiftX()),
+          (int) (position.getY() * display.caseSize() + display.shiftY()),
+          (int) display.caseSize(),
+          (int) display.caseSize());
+    });
+  }
+
   public void displayInventory(World world, ApplicationContext context, ImageCache cachedImages,
       Position cursorPosition) {
     context.renderFrame(graphics -> {
@@ -151,8 +161,15 @@ public record Display(int caseSize, int shiftX, int shiftY) {
       case RIGHT -> cursorPosition.setX(cursorPosition.getX() + 1);
       case SPACE -> {
         Item item = player.getInventory().getItems().get(cursorPosition.getY() * 5 + cursorPosition.getX());
-        player.getInventory().removeItem(item);
-        player.setHealth(player.getHealth() + item.getHealth());
+        switch (item) {
+          case Weapon w -> player.equipItem(item);
+          case GeneralFood f -> {
+            player.getInventory().removeItem(item);
+            player.setHealth(max(player.getHealth() + f.getHealth(), player.getMaxHealth()));
+          }
+          default -> {
+          }
+        }
       }
       default -> {
       }
