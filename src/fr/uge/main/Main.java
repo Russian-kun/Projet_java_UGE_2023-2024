@@ -10,7 +10,6 @@ import fr.uge.TheBigAventure.display.Display;
 import fr.uge.TheBigAventure.display.Image;
 import fr.uge.TheBigAventure.display.ImageCache;
 import fr.uge.TheBigAventure.gameObjects.GeneralSkin;
-import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
 import fr.uge.TheBigAventure.keys.AcceptedKeys;
 import fr.uge.parser.Parser;
