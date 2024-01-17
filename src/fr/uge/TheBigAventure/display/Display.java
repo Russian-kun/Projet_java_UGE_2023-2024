@@ -7,11 +7,14 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 
-import fr.uge.TheBigAventure.characters.GameCharacter;
+import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.characters.Inventory;
 import fr.uge.TheBigAventure.characters.Player;
+import fr.uge.TheBigAventure.characters.Trade;
+import fr.uge.TheBigAventure.characters.TradeList;
 import fr.uge.TheBigAventure.food.GeneralFood;
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
@@ -162,6 +165,7 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
       drawInventoryRectangle(graphics, context, Color.DARK_GRAY, Color.WHITE, 2.0f);
       drawItemsInInventory(graphics, context, world.player().getInventory(), cachedImages);
       drawInventoryCursor(graphics, context, cursorPosition);
+      drawHealthBar(graphics, world.player());
     });
   }
 
@@ -210,13 +214,14 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
   }
 
   public void interpretKey(ApplicationContext context, Player player, KeyboardKey key, Position cursorPosition) {
+    Inventory inventory = player.getInventory();
     switch (key) {
       case UP -> cursorPosition.setY(cursorPosition.getY() <= 0 ? 0 : cursorPosition.getY() - 1);
       case DOWN -> cursorPosition.setY(cursorPosition.getY() + 1);
       case LEFT -> cursorPosition.setX(cursorPosition.getX() <= 0 ? 0 : cursorPosition.getX() - 1);
       case RIGHT -> cursorPosition.setX(cursorPosition.getX() + 1);
       case SPACE -> {
-        Item item = player.getInventory().getItems().get(cursorPosition.getY() * 5 + cursorPosition.getX());
+        Item item = inventory.getItems().get(cursorPosition.getY() * 5 + cursorPosition.getX());
         switch (item) {
           case Weapon w -> {
             if (player.getWeapon() != w)
@@ -225,8 +230,8 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
               player.unequipItem();
           }
           case GeneralFood f -> {
-            player.getInventory().removeItem(item);
-            player.setHealth(max(player.getHealth() + f.getHealth(), player.getMaxHealth()));
+            inventory.removeItem(item);
+            player.heal(f.getHealth());
           }
           default -> {
           }
@@ -235,7 +240,6 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
       default -> {
       }
     }
-    Inventory inventory = player.getInventory();
     int itemPerLine = (int) (500 / (24 + 10));
     if (itemPerLine == 0)
       itemPerLine = 1;
@@ -275,17 +279,118 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
   }
 
   private static void drawHealthBar(Graphics2D graphics, Player player) {
-    int healthBarX = 20;
-    int healthBarY = 20;
-    int healthBarWidth = 100;
-    int healthBarHeight = 10;
+    int healthBarX = 20, healthBarY = 20;
+    int healthBarWidth = 100, healthBarHeight = 10;
     graphics.setColor(Color.GRAY);
-    graphics.fill(new Rectangle2D.Float(healthBarX - 1, healthBarY - 1, healthBarWidth + 1, healthBarHeight + 1));
-    graphics.setColor(Color.WHITE);
-    graphics.drawRect(healthBarX - 1, healthBarY - 1, healthBarWidth + 1, healthBarHeight + 1);
+    graphics.fill(new Rectangle2D.Float(healthBarX - 1, healthBarY - 1, healthBarWidth + 2, healthBarHeight + 2));
     graphics.setColor(Color.RED);
     graphics.fill(new Rectangle2D.Float(healthBarX, healthBarY,
-        healthBarWidth * (player.getHealth() / player.getMaxHealth()), healthBarHeight));
+        (int) (healthBarWidth * ((float) player.getHealth() / player.getMaxHealth())), healthBarHeight));
   }
 
+  public static void gameOverLoop(World world, ImageCache cachedImages, ApplicationContext context, Display display) {
+    Event event;
+    KeyboardKey key;
+    context.renderFrame(graphics -> {
+      graphics.setColor(Color.BLACK);
+      graphics.fillRect(0, 0, (int) context.getScreenInfo().getWidth(), (int) context.getScreenInfo().getHeight());
+      graphics.setColor(Color.WHITE);
+      graphics.drawString("GAME OVER", (int) context.getScreenInfo().getWidth() / 2 - 50,
+          (int) context.getScreenInfo().getHeight() / 2);
+    });
+    while (true) {
+      event = context.pollOrWaitEvent(1000 / 30);
+      if (event != null && event.getAction() == Action.KEY_PRESSED) {
+        if (AcceptedKeys.isAcceptedKey(key = event.getKey())) {
+          if (key == KeyboardKey.Q)
+            break;
+        }
+      }
+    }
+  }
+
+  public static void tradeOverlay(ImageCache cachedImages, ApplicationContext context, Display display,
+      Friend friend, int cursorPosition) {
+    int inventoryX = (int) context.getScreenInfo().getWidth() / 2 - 250;
+    int inventoryY = (int) context.getScreenInfo().getHeight() / 2 - 250;
+    TradeList trades = friend.getTrades();
+    context.renderFrame(graphics -> {
+      display.drawInventoryRectangle(graphics, context, Color.DARK_GRAY, Color.WHITE, 2.0f);
+      Display.tradeCursor(cachedImages, context, display, trades, cursorPosition, graphics);
+      graphics.setColor(Color.BLACK);
+      ArrayList<Trade> tradeList = trades.getTrades();
+      for (int i = 0; i < tradeList.size(); i++) {
+        Display.drawTrade(graphics, cachedImages, context, display, tradeList.get(i),
+            inventoryX + 50,
+            inventoryY + 50 + i * 60);
+      }
+      Display.speak(friend, display, graphics, context);
+    });
+  }
+
+  public static void tradeCursor(ImageCache cachedImages, ApplicationContext context, Display display,
+      TradeList trades, int cursorPosition, Graphics2D graphics) {
+    int inventoryX = (int) context.getScreenInfo().getWidth() / 2 - 250;
+    int inventoryY = (int) context.getScreenInfo().getHeight() / 2 - 250;
+    graphics.setColor(Color.RED);
+    graphics.drawRect(inventoryX + 50, inventoryY + 45 + cursorPosition * 60, 200, 60);
+  }
+
+  public static void drawTrade(Graphics2D graphics, ImageCache cachedImages, ApplicationContext context,
+      Display display, Trade trade, int x, int y) {
+    graphics.setColor(Color.WHITE);
+    graphics.drawImage(cachedImages.getImage(trade.getItems()[0]).getData(), x, y, 50, 50, null);
+
+    graphics.drawString("->", x + 75, y + 30);
+
+    graphics.drawImage(cachedImages.getImage(trade.getItems()[1]).getData(), x + 100, y, 50, 50, null);
+    if (trade.getPriceName() != null)
+      graphics.drawString(trade.getPriceName(), x + 160, y + 30);
+  }
+
+  public static void speak(Friend friend, Display display, Graphics2D graphics, ApplicationContext context) {
+    graphics.setColor(Color.BLACK);
+    graphics.fillRect(20, 20, 2 * friend.getText().length(), 10);
+    graphics.setColor(Color.WHITE);
+    graphics.drawString(friend.getText(), 20, 20);
+  }
+
+  public static void tradeLoop(World world, ImageCache cachedImages, ApplicationContext context, Display display,
+      Friend friend) {
+    Event event;
+    KeyboardKey key;
+    int cursorPosition = 0;
+    TradeList trades = friend.getTrades();
+    Inventory inventory = world.player().getInventory();
+    tradeOverlay(cachedImages, context, display, friend, cursorPosition);
+    boolean continueTrade = true;
+    while (continueTrade) {
+      event = context.pollOrWaitEvent(1000 / 30);
+      if (event != null && event.getAction() == Action.KEY_PRESSED) {
+        if (AcceptedKeys.isAcceptedKey(key = event.getKey())) {
+          switch (key) {
+            case Q -> continueTrade = false;
+            case UP ->
+              cursorPosition = cursorPosition <= 0 ? 0 : cursorPosition - 1;
+            case DOWN ->
+              cursorPosition = cursorPosition >= trades.size() - 1 ? trades.size() - 1 : cursorPosition + 1;
+            case SPACE -> {
+              Item price = trades.getTrades().get(cursorPosition).getItems()[0];
+              if (inventory.contains(price)) {
+                Item item = trades.getTrades().get(cursorPosition).getItems()[1];
+
+                inventory.removeItem(price);
+                inventory.addItem(item);
+                item.setPosition(world.player().getPosition());
+              }
+            }
+            default -> {
+            }
+          }
+          tradeOverlay(cachedImages, context, display, friend, cursorPosition);
+        }
+      }
+    }
+    hideInventory(world, context, display, cachedImages);
+  }
 }

@@ -6,10 +6,12 @@ import java.nio.file.Path;
 import java.time.LocalTime;
 import java.util.HashMap;
 
+import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.display.Display;
 import fr.uge.TheBigAventure.display.Image;
 import fr.uge.TheBigAventure.display.ImageCache;
 import fr.uge.TheBigAventure.gameObjects.GeneralSkin;
+import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
 import fr.uge.TheBigAventure.keys.AcceptedKeys;
 import fr.uge.parser.Parser;
@@ -57,9 +59,15 @@ public class Main {
           event = context.pollOrWaitEvent(characterMoveCooldown);
           KeyboardKey key = null;
           if (event != null && event.getAction() == Action.KEY_PRESSED) {
-            if (AcceptedKeys.isMovementKey((key = event.getKey())))
-              moved = world.player().move(world, key);
-            else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
+            if (AcceptedKeys.isMovementKey((key = event.getKey()))) {
+              if ((moved = world.player().move(world, key))) {
+                Position tmp = world.player().triedToGo();
+                Friend friend = null;
+                if (world.player().getPreviousPosition() != tmp && (friend = world.friendAt(tmp)) != null) {
+                  Display.tradeLoop(world, cachedImages, context, display, friend);
+                }
+              }
+            } else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
               Display.inventoryLoop(world, cachedImages, context, display);
 
             } else if (key == KeyboardKey.Q) {
@@ -67,8 +75,13 @@ public class Main {
             }
             event = null;
           }
+
           if ((cooldown += (LocalTime.now().toNanoOfDay() - start) / 1000000) > characterMoveCooldown) {
             moved = moved || world.update();
+            if (world.player().getHealth() <= 0) {
+              Display.gameOverLoop(world, cachedImages, context, display);
+              break;
+            }
             cooldown = 0;
           }
 

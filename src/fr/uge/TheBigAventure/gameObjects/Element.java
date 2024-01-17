@@ -98,6 +98,8 @@ public abstract class Element {
       case "obstacle" -> {
         if (attributes.containsKey("locked"))
           yield Door.valueOf(attributes);
+        else if (attributes.get("skin").equals("LEVER"))
+          yield Lever.valueOf(attributes);
         else
           yield Obstacle.valueOf(attributes);
       }
@@ -106,5 +108,4 @@ public abstract class Element {
       default -> throw new IllegalArgumentException("Unknown element");
     };
   }
-
 }

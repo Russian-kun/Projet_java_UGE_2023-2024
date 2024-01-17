@@ -7,6 +7,7 @@ import java.util.Objects;
 import fr.uge.TheBigAventure.gameObjects.Door;
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
+import fr.uge.TheBigAventure.gameObjects.Obstacle;
 import fr.uge.TheBigAventure.gameObjects.Weapon;
 import fr.uge.TheBigAventure.gameObjects.Item.ItemSkin;
 import fr.uge.TheBigAventure.general.Position;
@@ -57,8 +58,23 @@ public class Player extends GameCharacter {
   public boolean move(World world, KeyboardKey key) {
     Objects.requireNonNull(key);
     previousPosition = new Position(getPosition().getX(), getPosition().getY());
-    Position newPosition = null;
-    boolean moved = false;
+    Position newPosition = interpretMoveKey(key);
+    lastDirection = getDirection(newPosition, getPosition());
+
+    boolean moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
+    if (moved)
+      getInventory().pickupWorldItem(world, getPosition(), newPosition);
+    else if ((moved = canOpenDoor(world, newPosition)))
+      ((Door) world.doorAt(newPosition)).openDoor(world, inventory);
+    else if ((moved = world.isInteractable(newPosition)))
+      moved = interactWorldAt(world, newPosition, moved);
+    else
+      moved = interactCharacterAt(world, newPosition, moved);
+    return moved;
+  }
+
+  private Position interpretMoveKey(KeyboardKey key) {
+    Position newPosition;
     switch (key) {
       case UP -> newPosition = new Position(getPosition().getX(), getPosition().getY() - 1);
       case DOWN -> newPosition = new Position(getPosition().getX(), getPosition().getY() + 1);
@@ -66,15 +82,7 @@ public class Player extends GameCharacter {
       case RIGHT -> newPosition = new Position(getPosition().getX() + 1, getPosition().getY());
       default -> throw new IllegalArgumentException("key must be a movement key");
     }
-    lastDirection = getDirection(newPosition, getPosition());
-    moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
-    if (moved)
-      getInventory().pickupWorldItem(world, getPosition(), newPosition);
-    else if ((moved = canOpenDoor(world, newPosition)))
-      ((Door) world.doorAt(newPosition)).openDoor(world, inventory);
-    else
-      moved = interactCharacterAt(world, newPosition, moved);
-    return moved;
+    return newPosition;
   }
 
   private boolean interactCharacterAt(World world, Position newPosition, boolean moved) {
@@ -85,6 +93,15 @@ public class Player extends GameCharacter {
       moved = true;
     } else if ((friend = world.friendAt(newPosition)) != null) {
       friend.update(world);
+      moved = true;
+    }
+    return moved;
+  }
+
+  private boolean interactWorldAt(World world, Position newPosition, boolean moved) {
+    Element element;
+    if ((element = world.interactableObstacleAt(newPosition)) != null) {
+      ((Obstacle) element).interact(world);
       moved = true;
     }
     return moved;
@@ -142,6 +159,7 @@ public class Player extends GameCharacter {
   }
 
   public void equipItem(Item item) {
+    Objects.requireNonNull(item);
     if (!inventory.contains(item))
       throw new IllegalArgumentException("item must be in inventory");
     equipedItem = (Weapon) item;
@@ -153,6 +171,15 @@ public class Player extends GameCharacter {
 
   public Weapon getWeapon() {
     return equipedItem;
+  }
+
+  public Position triedToGo() {
+    return switch (lastDirection) {
+      case UP -> new Position(previousPosition.getX(), previousPosition.getY() - 1);
+      case DOWN -> new Position(previousPosition.getX(), previousPosition.getY() + 1);
+      case LEFT -> new Position(previousPosition.getX() - 1, previousPosition.getY());
+      case RIGHT -> new Position(previousPosition.getX() + 1, previousPosition.getY());
+    };
   }
 
 }

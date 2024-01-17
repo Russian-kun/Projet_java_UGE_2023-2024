@@ -19,7 +19,7 @@ public record Inventory(ArrayList<Item> items) {
   }
 
   public void removeItem(Item item) {
-    items.remove(item);
+    items.remove(find(item));
   }
 
   public ArrayList<Item> getItems() {
@@ -27,7 +27,14 @@ public record Inventory(ArrayList<Item> items) {
   }
 
   public boolean contains(Item item) {
-    return items.contains(item);
+    return find(item) != null;
+  }
+
+  public Item find(Item item) {
+    if (item.getSkin().toString().equals(item.getName()) || item.getName() == null)
+      return items.stream().filter(i -> i.getSkin() == item.getSkin()).findFirst().orElse(null);
+    return items.stream().filter(i -> i.getSkin() == item.getSkin() && i.getName().equals(item.getName())).findFirst()
+        .orElse(null);
   }
 
   public int size() {
