@@ -1,5 +1,7 @@
 package fr.uge.TheBigAventure.food;
 
+import java.util.Arrays;
+
 import fr.uge.TheBigAventure.gameObjects.InventoryObjectSkin;
 import fr.uge.TheBigAventure.general.Position;
 
@@ -21,6 +23,10 @@ public class Food extends GeneralFood {
 
     public GeneralFoodType getFoodSkin() {
       return type;
+    }
+
+    public static FoodType convert(GeneralFoodType old) {
+      return Arrays.stream(FoodType.values()).filter(type -> type.getFoodSkin() == old).findFirst().orElse(null);
     }
   }
 
