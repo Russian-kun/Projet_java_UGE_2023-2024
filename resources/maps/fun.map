@@ -63,6 +63,12 @@
 
 [element]
   name: red
+  skin: LEVER
+  position: (42,38)
+  kind: obstacle
+
+[element]
+  name: red
   skin: KEY
   position: (63,8)
   kind: item
@@ -83,6 +89,13 @@
   zone: (38, 24) (10 x 8)
   behavior: stroll
   text: "I'm a bee!"
+  trade: CASH -> KEY red, CASH -> PIZZA, BURGER -> SWORD test, PIZZA -> SHOVEL
+
+[element]
+  name: moneyyyy
+  skin: CASH
+  position: (4,5)
+  kind: item
 
 [element]
   name: durendale
@@ -108,7 +121,7 @@
   health: 10
   zone: (38, 24) (10 x 8)
   behavior: stroll
-  damage: 5
+  damage: 3
 
 
 [element]
