@@ -13,6 +13,14 @@ public class Position {
     return "(" + x + "," + y + ")";
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Position))
+      return false;
+    Position position = (Position) o;
+    return x == position.x && y == position.y;
+  }
+
   public static Position valueOf(String position) {
     String[] tmp = position.replaceAll("[\\(\\) ]", "").split(",");
     int x = Integer.parseInt(tmp[0]);
