@@ -13,7 +13,7 @@ public class Door extends Obstacle {
   private Item doorKey;
 
   enum DoorType implements ObstacleType {
-    DOOR, GATE;
+    DOOR, GATE, HOUSE, TOWER;
   }
 
   public Door(String name, ObstacleType skin, Position position, Item key, boolean isOpen) {
