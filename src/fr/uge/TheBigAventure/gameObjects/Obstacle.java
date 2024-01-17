@@ -40,6 +40,7 @@ public class Obstacle extends Element {
       return true;
     return switch (obstacle.skin()) {
       case ImpassableType it -> false;
+      case Door.DoorType dt -> false;
       case PassableType pt -> true;
     };
   }

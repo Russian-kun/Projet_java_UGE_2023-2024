@@ -175,15 +175,22 @@ public class Parser {
    */
   private static void addAttributes(Lexer lexer, HashMap<String, String> attributes, ParsingException pe) {
     Result result;
+    String value;
     while ((result = lexer.nextResult()) != null) {
       if (!result.token().name().equals("IDENTIFIER"))
         break;
       String key = result.content();
       result = findNextIdentifier(lexer, "COLON");
       result = lexer.nextResult();
-      if (result.content().equals(""))
+      value = result.content();
+      if (value.equals(""))
         pe.addException(new IOException("Error while reading element"));
-      attributes.put(key, result.content());
+      else if (value.contains("\""))
+        value = value.replaceAll("\"", "");
+      else if (key.contains("locked"))
+        value += " " + findNextIdentifier(lexer, "IDENTIFIER").content();
+
+      attributes.put(key, value);
     }
   }
 

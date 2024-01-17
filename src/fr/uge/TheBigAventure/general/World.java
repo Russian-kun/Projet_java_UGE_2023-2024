@@ -6,6 +6,8 @@ import java.util.Objects;
 import fr.uge.TheBigAventure.characters.Enemy;
 import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.characters.Player;
+import fr.uge.TheBigAventure.gameObjects.Door;
+import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
 import fr.uge.TheBigAventure.gameObjects.Obstacle;
 import fr.uge.TheBigAventure.gameObjects.Obstacle.ImpassableType;
@@ -51,7 +53,9 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
       return free;
     free = Obstacle.isPassable(worldMap.map()[y][x])
         && enemies.stream().noneMatch(enemy -> enemy.getPosition().getX() == x && enemy.getPosition().getY() == y)
-        && friends.stream().noneMatch(friend -> friend.getPosition().getX() == x && friend.getPosition().getY() == y);
+        && friends.stream().noneMatch(friend -> friend.getPosition().getX() == x && friend.getPosition().getY() == y)
+        && obstacles.stream()
+            .noneMatch(obstacle -> obstacle.getPosition().getX() == x && obstacle.getPosition().getY() == y);
     return free;
   }
 
@@ -64,16 +68,35 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
     return null;
   }
 
-  public boolean doorAt(Position position) {
-    var tmp = worldMap.map()[position.getY()][position.getX()];
-    return tmp != null
-        && (tmp.getSkin().equals(ImpassableType.DOOR) || tmp.getSkin().equals(ImpassableType.GATE));
+  public static Element getElementPosition(ArrayList<? extends Element> elements, Position position) {
+    for (Element element : elements) {
+      if (element.getPosition().getX() == position.getX() && element.getPosition().getY() == position.getY()) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  public Door doorAt(Position position) {
+    return (Door) obstacles.stream().filter(obstacle -> obstacle.getPosition().getX() == position.getX()
+        && obstacle.getPosition().getY() == position.getY()
+        && (obstacle.skin().equals(ImpassableType.DOOR) || obstacle.skin().equals(ImpassableType.GATE))).findFirst()
+        .orElse(null);
   }
 
   public void removeItemPosition(Position position) {
     for (Item item : items) {
       if (item.getPosition().getX() == position.getX() && item.getPosition().getY() == position.getY()) {
         items.remove(item);
+        return;
+      }
+    }
+  }
+
+  public static void removeElementPosition(ArrayList<? extends Element> elements, Position position) {
+    for (Element element : elements) {
+      if (element.getPosition().getX() == position.getX() && element.getPosition().getY() == position.getY()) {
+        elements.remove(element);
         return;
       }
     }

@@ -3,6 +3,7 @@ package fr.uge.TheBigAventure.characters;
 import java.util.ArrayList;
 import java.util.Map;
 
+import fr.uge.TheBigAventure.gameObjects.Door;
 import fr.uge.TheBigAventure.gameObjects.Element;
 import fr.uge.TheBigAventure.gameObjects.Item;
 import fr.uge.TheBigAventure.gameObjects.Weapon;
@@ -64,7 +65,7 @@ public class Player extends GameCharacter {
     if (moved)
       getInventory().pickupWorldItem(world, getPosition(), newPosition);
     else if (canOpenDoor(world, newPosition)) {
-      openDoor(world, newPosition);
+      ((Door) world.doorAt(newPosition)).openDoor(world, inventory);
       moved = true;
     } else {
       Enemy enemy;
@@ -81,23 +82,20 @@ public class Player extends GameCharacter {
     return moved;
   }
 
-  private void openDoor(World world, Position newPosition) {
-    removeFirstItem(ItemSkin.KEY);
-    world.removeObjectPosition(newPosition);
-  }
-
-  private void removeFirstItem(ItemSkin itemSkin) {
-    inventory.getItems().stream()
-        .filter(item -> item.getSkin().equals(itemSkin))
-        .findFirst()
-        .ifPresent(item -> {
-          inventory.removeItem(item);
-        });
-  }
-
   private boolean canOpenDoor(World world, Position newPosition) {
-    return world.doorAt(newPosition)
-        && inventory.getItems().stream().anyMatch(item -> item.getSkin().equals(ItemSkin.KEY));
+    Door door = world.doorAt(newPosition);
+    if (door == null)
+      return false;
+    Item key = correspondingKey(door);
+    return key != null;
+  }
+
+  private Item correspondingKey(Door door) {
+    return inventory.getItems().stream()
+        .filter(item -> item.getSkin().equals(ItemSkin.KEY)
+            && ((Item) item).getName().equals(door.getKeyColor()))
+        .findFirst()
+        .orElse(null);
   }
 
   public boolean moveIfFree(World world, int x, int y) {

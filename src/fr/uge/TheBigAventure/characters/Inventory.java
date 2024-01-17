@@ -2,6 +2,7 @@ package fr.uge.TheBigAventure.characters;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import fr.uge.TheBigAventure.gameObjects.Item;
 import fr.uge.TheBigAventure.general.Position;
@@ -40,5 +41,10 @@ public record Inventory(ArrayList<Item> items) {
       addItem(item);
       world.removeItemPosition(position);
     }
+  }
+
+  // parameter of type : item -> {item ...}
+  public void removeFirstItem(Predicate<? super Item> filter) {
+    items.removeIf(filter);
   }
 }

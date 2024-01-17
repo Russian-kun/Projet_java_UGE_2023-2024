@@ -95,7 +95,12 @@ public abstract class Element {
         else
           yield Item.valueOf(attributes);
       }
-      case "obstacle" -> Obstacle.valueOf(attributes);
+      case "obstacle" -> {
+        if (attributes.containsKey("locked"))
+          yield Door.valueOf(attributes);
+        else
+          yield Obstacle.valueOf(attributes);
+      }
       case "enemy" -> Enemy.valueOf(attributes);
       case "friend" -> Friend.valueOf(attributes);
       default -> throw new IllegalArgumentException("Unknown element");
