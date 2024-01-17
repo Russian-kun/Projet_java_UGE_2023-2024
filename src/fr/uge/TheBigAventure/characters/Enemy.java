@@ -21,13 +21,13 @@ public class Enemy extends GameCharacter {
   private Zone zone;
   private Behavior behavior;
   private int damage;
+  private int movementTentative = 0;
 
   // shy, stroll et agressive
   public enum Behavior {
     SHY,
     STROLL,
     AGRESSIVE;
-
   }
 
   public Enemy(String name, CharacterSkin skin, Position position, int health, Zone zone, String behavior, int damage) {
@@ -78,9 +78,9 @@ public class Enemy extends GameCharacter {
   public boolean update(World world) {
     Position previousPosition = new Position(getPosition().getX(), getPosition().getY());
     if (world.player().getPosition().distance(getPosition()) <= 5) {
-      activeBehavior(this, world.player());
+      activeBehavior(world);
     } else {
-      passiveBehavior(this);
+      passiveBehavior(world);
     }
     return previousPosition.getX() != getPosition().getX() || previousPosition.getY() != getPosition().getY();
   }
@@ -105,55 +105,70 @@ public class Enemy extends GameCharacter {
     approach(new Position(-target.getX(), -target.getY()));
   }
 
-  public void passiveBehavior(Enemy enemy) {
-    switch (enemy.getBehavior()) {
-      case SHY -> passiveShyBehavior(enemy);
-      case STROLL -> passiveStrollBehavior(enemy);
-      case AGRESSIVE -> passiveShyBehavior(enemy);
+  public void passiveBehavior(World world) {
+    switch (getBehavior()) {
+      case SHY -> passiveShyBehavior(world);
+      case STROLL -> passiveStrollBehavior(world);
+      case AGRESSIVE -> passiveShyBehavior(world);
       default -> throw new IllegalArgumentException("behavior not found");
     }
   }
 
-  public void activeBehavior(Enemy enemy, Player player) {
-    switch (enemy.getBehavior()) {
-      case SHY -> shyBehavior(enemy, player.getPosition());
-      case STROLL -> passiveStrollBehavior(enemy);
-      case AGRESSIVE -> agressiveBehavior(enemy, player);
+  public void activeBehavior(World world) {
+    switch (getBehavior()) {
+      case SHY -> shyBehavior(world.player().getPosition());
+      case STROLL -> passiveStrollBehavior(world);
+      case AGRESSIVE -> agressiveBehavior(world.player());
       default -> throw new IllegalArgumentException("behavior not found");
     }
   }
 
-  public void passiveShyBehavior(Enemy enemy) {
-    if (enemy.zone != new Zone(enemy.getPosition(), 1, 1))
-      passiveStrollBehavior(enemy);
+  public void passiveShyBehavior(World world) {
+    if (this.zone != new Zone(this.getPosition(), 1, 1))
+      passiveStrollBehavior(world);
   }
 
-  public void shyBehavior(Enemy enemy, Position player) {
+  public void shyBehavior(Position player) {
     // We flee from the player
     flee(player);
   }
 
-  public void passiveStrollBehavior(Enemy enemy) {
+  public void passiveStrollBehavior(World world) {
     // 1/2 times, we move somewhere in the zone
-    if (Math.random() < 0.5) {
-      int x = enemy.getPosition().getX();
-      int y = enemy.getPosition().getY();
-      // int newX = x + (int) (Math.random() * 1) - 1;
-      // int newY = y + (int) (Math.random() * 3) - 1;
-      int newX = x, newY = y;
-      if (Math.random() < 0.5)
-        newX = x + (int) (Math.random() * 3 - 0.5) % 2;
-      else
-        newY = y + (int) (Math.random() * 3 - 0.5) % 2;
-      if (enemy.getZone().contains(new Position(newX, newY)))
-        enemy.move(newX, newY);
-    }
+    if (Math.random() <= 0.5 + movementTentative / 20) {
+      int x = getPosition().getX();
+      int y = getPosition().getY();
+
+      // Randomly decide whether to move in the x or y direction
+      int newX = x;
+      int newY = y;
+      do {
+        newX = x;
+        newY = y;
+        if (Math.random() < 0.5) {
+          if (Math.random() < 0.5)
+            newX = x + 1;
+          else
+            newX = x - 1;
+        } else {
+          if (Math.random() < 0.5)
+            newY = y + 1;
+          else
+            newY = y - 1;
+        }
+        // Check if the new position is within the zone
+      } while (!getZone().contains(new Position(newX, newY)));
+      moveIfEmpty(newX, newY, world);
+      movementTentative = 0;
+    } else
+      movementTentative++;
+
   }
 
-  public void agressiveBehavior(Enemy enemy, Player player) {
+  public void agressiveBehavior(Player player) {
     // We approach the player and stay one square away
     approach(player.getPosition());
-    if (enemy.getPosition().distance(player.getPosition()) <= 1)
+    if (getPosition().distance(player.getPosition()) <= 1)
       attack(player);
   }
 
@@ -167,5 +182,10 @@ public class Enemy extends GameCharacter {
 
   public static void die(Enemy enemy, World world) {
     world.enemies().remove(enemy);
+  }
+
+  public void moveIfEmpty(int x, int y, World world) {
+    if (world.isFree(x, y) && !world.player().getPosition().equals(new Position(x, y)))
+      move(x, y);
   }
 }
