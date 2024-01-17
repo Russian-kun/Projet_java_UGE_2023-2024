@@ -28,16 +28,6 @@ public class Item extends Element {
     return item.getName().equals(this.getName()) && item.getPosition().equals(this.getPosition());
   }
 
-  public static Item valueOf(String name, String skin, Position position) {
-    ItemSkin skinEnum = null;
-    try {
-      skinEnum = ItemSkin.valueOf(skin.toUpperCase());
-    } catch (Exception e) {
-      throw new IllegalArgumentException("skin must be an item");
-    }
-    return new Item(name, skinEnum, position);
-  }
-
   public static Element valueOf(Map<String, String> attributes) {
     ItemSkin skinEnum = null;
     try {
