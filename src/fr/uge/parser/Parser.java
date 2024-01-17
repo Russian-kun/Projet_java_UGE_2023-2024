@@ -187,7 +187,15 @@ public class Parser {
         pe.addException(new IOException("Error while reading element"));
       else if (value.contains("\""))
         value = value.replaceAll("\"", "");
-      else if (key.contains("locked"))
+      else if (key.contains("trade")) {
+        while ((result = lexer.nextResult()) != null && result.token().name().contains("TRADE")) {
+          value += result.content();
+        }
+        if (result == null)
+          pe.addException(new IOException("Error while reading element"));
+        else
+          lexer = new Lexer(lexer.text().substring(lexer.lastResult().start()));
+      } else if (key.contains("locked"))
         value += " " + findNextIdentifier(lexer, "IDENTIFIER").content();
 
       attributes.put(key, value);

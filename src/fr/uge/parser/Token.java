@@ -9,6 +9,9 @@ public enum Token {
   POSITION("\\( *[0-9]+ *\\, *[0-9]+ *\\)"),
   // Adding capturing groups seem crash the parser?
   // TRADE("[A-Za-z]+ -> [A-Za-z]+( [A-Za-z]+) *,{0,1}"),
+  // We separate the trade
+  TRADE_WITH_NAME("[A-Za-z]+ -> [A-Za-z]+ *[A-Za-z]+ *,{0,1}"),
+  TRADE("[A-Za-z]+ -> [A-Za-z]+ *,{0,1}"),
   IDENTIFIER("[A-Za-z]+"),
   NUMBER("[0-9]+"),
   LEFT_PARENS("\\("),
