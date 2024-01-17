@@ -132,8 +132,11 @@ public class Player extends GameCharacter {
 
   public void heal(int quantity) {
     health += quantity;
+    if (health > maxHealth)
+      health = maxHealth;
   }
 
+  @Override
   public void takeDamage(int quantity) {
     health -= quantity;
   }

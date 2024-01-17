@@ -159,7 +159,7 @@ public class Enemy extends GameCharacter {
         // Check if the new position is within the zone
       } while (!getZone().contains(new Position(newX, newY)));
       moveIfEmpty(newX, newY, world);
-      movementTentative = 0;
+      movementTentative = -2;
     } else
       movementTentative++;
 
@@ -173,7 +173,7 @@ public class Enemy extends GameCharacter {
   }
 
   public void attack(GameCharacter character) {
-    character.setHealth(character.getHealth() - damage);
+    character.takeDamage(damage);
   }
 
   public void takeDamage(int damage) {
@@ -185,7 +185,10 @@ public class Enemy extends GameCharacter {
   }
 
   public void moveIfEmpty(int x, int y, World world) {
-    if (world.isFree(x, y) && !world.player().getPosition().equals(new Position(x, y)))
+    boolean player = world.player().getPosition().equals(new Position(x, y));
+    if (player)
+      attack(world.player());
+    else if (world.isFree(x, y))
       move(x, y);
   }
 }

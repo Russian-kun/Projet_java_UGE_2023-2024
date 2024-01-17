@@ -75,4 +75,8 @@ public class GameCharacter extends Element {
     return previousPosition;
   }
 
+  public void takeDamage(int quantity) {
+    health -= quantity;
+  }
+
 }
