@@ -52,11 +52,6 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
   }
 
   public static void drawWorld(Graphics2D graphics, Display display, ImageCache cachedImages, World world) {
-    clearPreviousPosition(graphics, display, world.player());
-    for (int i = 0; i < world.enemies().size(); i++) {
-      clearPreviousPosition(graphics, display, world.enemies().get(i));
-    }
-
     Position center = getCenter(display, world);
 
     drawCenteredWorldMap(graphics, display, cachedImages, world.worldMap(), center);
@@ -124,7 +119,7 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
 
   private static void drawEquipedItem(Graphics2D graphics, Display display, ImageCache cachedImages, Element item,
       Position center) {
-    // L'item doit etre decalé par rapport au joueur et incliné (comme une épée)
+    // The item must be offset from the player and tilted (like a sword)
     Image image = cachedImages.getImage(item);
     graphics.drawImage(image.rotatedData(-30),
         (int) ((item.getPosition().getX() - center.getX() + ((display.viewSize() - 1) / 2)) * display.caseSize()
@@ -134,27 +129,6 @@ public record Display(int caseSize, int shiftX, int shiftY, int viewSize) {
         display.caseSize(),
         display.caseSize(),
         null);
-  }
-
-  private static void clearPreviousPosition(Graphics2D graphics, Display display, GameCharacter character) {
-    if (character.getPreviousPosition() != null) {
-      Position prev = character.getPreviousPosition();
-      graphics.clearRect(
-          (int) (prev.getX() * display.caseSize() + display.shiftX()),
-          (int) (prev.getY() * display.caseSize() + display.shiftY()),
-          (int) display.caseSize(),
-          (int) display.caseSize());
-    }
-  }
-
-  public static void clearPosition(ApplicationContext context, Display display, Position position) {
-    context.renderFrame(graphics -> {
-      graphics.clearRect(
-          (int) (position.getX() * display.caseSize() + display.shiftX()),
-          (int) (position.getY() * display.caseSize() + display.shiftY()),
-          (int) display.caseSize(),
-          (int) display.caseSize());
-    });
   }
 
   public static void inventoryLoop(final World world, final ImageCache cachedImages, ApplicationContext context,

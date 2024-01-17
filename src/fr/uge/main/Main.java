@@ -57,10 +57,9 @@ public class Main {
           event = context.pollOrWaitEvent(characterMoveCooldown);
           KeyboardKey key = null;
           if (event != null && event.getAction() == Action.KEY_PRESSED) {
-            if (AcceptedKeys.isMovementKey((key = event.getKey()))) {
-              if ((moved = world.player().move(world, key)))
-                Display.clearPosition(context, display, world.player().getPosition());
-            } else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
+            if (AcceptedKeys.isMovementKey((key = event.getKey())))
+              moved = world.player().move(world, key);
+            else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
               Display.inventoryLoop(world, cachedImages, context, display);
 
             } else if (key == KeyboardKey.Q) {
@@ -78,7 +77,6 @@ public class Main {
               graphics.setColor(Color.WHITE);
               Display.clearScreen(graphics, context, display);
               Display.drawWorld(graphics, display, cachedImages, world);
-
             });
           }
           end = LocalTime.now().toNanoOfDay();
