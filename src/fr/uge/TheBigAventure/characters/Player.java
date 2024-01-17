@@ -2,6 +2,7 @@ package fr.uge.TheBigAventure.characters;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import fr.uge.TheBigAventure.gameObjects.Door;
 import fr.uge.TheBigAventure.gameObjects.Element;
@@ -15,6 +16,11 @@ import fr.umlv.zen5.KeyboardKey;
 public class Player extends GameCharacter {
   private final Inventory inventory = new Inventory(new ArrayList<>());
   private Weapon equipedItem = null;
+  private Direction lastDirection = Direction.DOWN;
+
+  public enum Direction {
+    UP, DOWN, LEFT, RIGHT
+  }
 
   public enum PlayerSkin implements GeneralCharacterSkin {
     BABA(CharacterSkin.BABA),
@@ -49,8 +55,7 @@ public class Player extends GameCharacter {
   }
 
   public boolean move(World world, KeyboardKey key) {
-    if (key == null)
-      throw new IllegalArgumentException("key must not be null");
+    Objects.requireNonNull(key);
     previousPosition = new Position(getPosition().getX(), getPosition().getY());
     Position newPosition = null;
     boolean moved = false;
@@ -61,25 +66,41 @@ public class Player extends GameCharacter {
       case RIGHT -> newPosition = new Position(getPosition().getX() + 1, getPosition().getY());
       default -> throw new IllegalArgumentException("key must be a movement key");
     }
+    lastDirection = getDirection(newPosition, getPosition());
     moved = moveIfFree(world, newPosition.getX(), newPosition.getY());
     if (moved)
       getInventory().pickupWorldItem(world, getPosition(), newPosition);
-    else if (canOpenDoor(world, newPosition)) {
+    else if ((moved = canOpenDoor(world, newPosition)))
       ((Door) world.doorAt(newPosition)).openDoor(world, inventory);
-      moved = true;
-    } else {
-      Enemy enemy;
-      Friend friend;
-      if ((enemy = world.enemyAt(newPosition)) != null) {
-        attack(enemy, world);
-        moved = true;
-      } else if ((friend = world.friendAt(newPosition)) != null) {
-        friend.update(world);
-        moved = true;
-      }
-    }
-
+    else
+      moved = interactCharacterAt(world, newPosition, moved);
     return moved;
+  }
+
+  private boolean interactCharacterAt(World world, Position newPosition, boolean moved) {
+    Enemy enemy;
+    Friend friend;
+    if ((enemy = world.enemyAt(newPosition)) != null) {
+      attack(enemy, world);
+      moved = true;
+    } else if ((friend = world.friendAt(newPosition)) != null) {
+      friend.update(world);
+      moved = true;
+    }
+    return moved;
+  }
+
+  private Direction getDirection(Position curr, Position prev) {
+    if (curr.getX() > prev.getX())
+      return Direction.RIGHT;
+    else if (curr.getX() < prev.getX())
+      return Direction.LEFT;
+    else if (curr.getY() > prev.getY())
+      return Direction.DOWN;
+    else if (curr.getY() < prev.getY())
+      return Direction.UP;
+    else
+      return lastDirection;
   }
 
   private boolean canOpenDoor(World world, Position newPosition) {
