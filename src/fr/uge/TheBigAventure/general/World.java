@@ -136,4 +136,16 @@ public record World(Player player, WorldMap worldMap, Encoding encoding, ArrayLi
     return friends.stream().filter(friend -> friend.getPosition().getX() == position.getX()
         && friend.getPosition().getY() == position.getY()).findFirst().orElse(null);
   }
+
+  public boolean isInteractable(Position position) {
+    // Levers, plants, vehicles, etc.
+    return obstacles.stream().anyMatch(obstacle -> obstacle.getPosition().getX() == position.getX()
+        && obstacle.getPosition().getY() == position.getY() && obstacle.skin().equals(ImpassableType.LEVER));
+  }
+
+  public Obstacle interactableObstacleAt(Position position) {
+    return obstacles.stream().filter(obstacle -> obstacle.getPosition().getX() == position.getX()
+        && obstacle.getPosition().getY() == position.getY() && obstacle.skin().equals(ImpassableType.LEVER))
+        .findFirst().orElse(null);
+  }
 }
