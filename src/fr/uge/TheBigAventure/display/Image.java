@@ -59,7 +59,7 @@ public record Image(Path path, BufferedImage data) {
     }
   }
 
-  public BufferedImage rotatedData(int angle) { // FIXME this method removes the alpha channel and crops the image
+  public BufferedImage rotatedData(int angle) {
     int w = data.getWidth(), h = data.getHeight(), x = w / 2, y = h / 2;
     double rads = Math.toRadians(angle), sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
     int newWidth = (int) Math.floor(w * cos + h * sin), newHeight = (int) Math.floor(h * cos + w * sin);
