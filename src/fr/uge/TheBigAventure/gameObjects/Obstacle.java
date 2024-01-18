@@ -3,13 +3,14 @@ package fr.uge.TheBigAventure.gameObjects;
 import java.util.Map;
 
 import fr.uge.TheBigAventure.general.Position;
+import fr.uge.TheBigAventure.general.World;
 
 public class Obstacle extends Element {
   private String name;
 
   public enum ImpassableType implements ObstacleType {
     BED, BOG, BOMB, BRICK, CHAIR, CLIFF, DOOR, FENCE, FORT, GATE, HEDGE, HOUSE, HUSK, HUSKS, LOCK, MONITOR, PIANO,
-    PILLAR, PIPE, ROCK, RUBBLE, SHELL, SIGN, SPIKE, STATUE, STUMP, TABLE, TOWER, TREE, TREES, WALL,
+    PILLAR, PIPE, ROCK, RUBBLE, SHELL, SIGN, SPIKE, STATUE, STUMP, TABLE, TOWER, TREE, TREES, WALL, LEVER,
     ICE, LAVA, WATER
   }
 
@@ -40,6 +41,7 @@ public class Obstacle extends Element {
       return true;
     return switch (obstacle.skin()) {
       case ImpassableType it -> false;
+      case Door.DoorType dt -> false;
       case PassableType pt -> true;
     };
   }
@@ -53,6 +55,16 @@ public class Obstacle extends Element {
       } catch (Exception e2) {
         return null;
       }
+    }
+  }
+
+  public void interact(World world) {
+    if (this instanceof Lever) {
+      Lever lever = (Lever) this;
+      if (lever.isOpen())
+        lever.closeDoor(world);
+      else
+        lever.openDoor(world);
     }
   }
 }

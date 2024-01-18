@@ -44,7 +44,7 @@
   E                                    g         WttttttttttttttttW
   E                                     g        WttttttttttttttttW
   E        FFFFF                                 WttttttttttttttttW
-  E        F                       WWWWWWWWWWOWWWWttttttttttttttttW
+  E        F                       WWWWWWWWWW WWWWttttttttttttttttW
   E        F    F                  WttttttttttttttttttttttttttttttW
   E        F    F                  WttttttttttttttttttttttttttttttW
   E        FFFFFQ                  WttttttttttttttttttttttttttttttW
@@ -55,11 +55,47 @@
   """
 
 [element]
+  name: redDoor
+  skin: DOOR
+  position: (43,39)
+  kind: obstacle
+  locked: KEY red
+
+[element]
+  name: red
+  skin: LEVER
+  position: (42,38)
+  kind: obstacle
+
+[element]
+  name: red
+  skin: KEY
+  position: (63,8)
+  kind: item
+
+[element]
   name: fluffy
   player: true
   skin: BABA
   position: (5,5)
   health: 10
+  
+[element]
+  name: bee
+  skin: BEE
+  position: (6, 6)
+  kind: friend
+  health: 10
+  zone: (38, 24) (10 x 8)
+  behavior: stroll
+  text: "I'm a bee!"
+  trade: CASH -> KEY red, CASH -> PIZZA, BURGER -> SWORD test, PIZZA -> SHOVEL
+
+[element]
+  name: moneyyyy
+  skin: CASH
+  position: (4,5)
+  kind: item
 
 [element]
   name: durendale
@@ -69,10 +105,13 @@
   damage: 15
 
 [element]
-  name: key
-  skin: KEY
-  position: (63,8)
+  name: foodTest
+  skin: BURGER
+  position: (6,7)
   kind: item
+  health: 5
+
+
 
 [element]
   name: waldo
@@ -82,7 +121,8 @@
   health: 10
   zone: (38, 24) (10 x 8)
   behavior: stroll
-  damage: 5
+  damage: 3
+
 
 [element]
   name: piano
@@ -210,5 +250,3 @@
   skin: BED
   position: (44,45)
   kind: obstacle
-
-

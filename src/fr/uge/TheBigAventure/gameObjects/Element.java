@@ -4,7 +4,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.uge.TheBigAventure.characters.Enemy;
+import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.characters.Player;
+import fr.uge.TheBigAventure.food.GeneralFood;
 import fr.uge.TheBigAventure.general.Position;
 
 // Les éléments de la carte sont définie par la section [element] qui définie des sous-sections [element] qui 
@@ -43,7 +45,7 @@ import fr.uge.TheBigAventure.general.Position;
 public abstract class Element {
   public final GeneralSkin skin;
   public final Kind kind;
-  public Position position;
+  private Position position;
 
   public enum Kind {
     PLAYER,
@@ -88,13 +90,22 @@ public abstract class Element {
       case "item" -> {
         if (attributes.containsKey("damage"))
           yield Weapon.valueOf(attributes);
+        else if (attributes.containsKey("health"))
+          yield GeneralFood.valueOf(attributes);
         else
           yield Item.valueOf(attributes);
       }
-      case "obstacle" -> Obstacle.valueOf(attributes);
+      case "obstacle" -> {
+        if (attributes.containsKey("locked"))
+          yield Door.valueOf(attributes);
+        else if (attributes.get("skin").equals("LEVER"))
+          yield Lever.valueOf(attributes);
+        else
+          yield Obstacle.valueOf(attributes);
+      }
       case "enemy" -> Enemy.valueOf(attributes);
+      case "friend" -> Friend.valueOf(attributes);
       default -> throw new IllegalArgumentException("Unknown element");
     };
   }
-
 }

@@ -6,11 +6,14 @@ import java.nio.file.Path;
 import java.time.LocalTime;
 import java.util.HashMap;
 
+import fr.uge.TheBigAventure.characters.Friend;
 import fr.uge.TheBigAventure.display.Display;
 import fr.uge.TheBigAventure.display.Image;
 import fr.uge.TheBigAventure.display.ImageCache;
 import fr.uge.TheBigAventure.gameObjects.GeneralSkin;
+import fr.uge.TheBigAventure.general.Position;
 import fr.uge.TheBigAventure.general.World;
+import fr.uge.TheBigAventure.keys.AcceptedKeys;
 import fr.uge.parser.Parser;
 import fr.umlv.zen5.Application;
 import fr.umlv.zen5.Event;
@@ -22,10 +25,21 @@ public class Main {
   static boolean isInventoryVisible = false;
 
   public static void main(String[] args) throws IOException {
-    final int frequency = 1000 / 120;
+    final var frequency = 1000 / 60;
     var filePath = Path.of("fun.map");
+    final World world;
+    final int characterMoveCooldown = 1000 / 2;
     try {
-      final World world = Parser.readMap(filePath);
+      world = Parser.readMap(filePath);
+      if (world == null) {
+        System.err.println("Error while parsing map");
+        return;
+      }
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+      return;
+    }
+    try {
       System.out.println(world);
       final ImageCache cachedImages = new ImageCache(new HashMap<GeneralSkin, Image>());
 
@@ -34,64 +48,67 @@ public class Main {
             (int) context.getScreenInfo().getWidth(),
             (int) context.getScreenInfo().getHeight());
 
-        Event key = null;
+        boolean moved = true;
+        var cooldown = 0;
+        Event event = null;
+        var start = LocalTime.now().toNanoOfDay();
+        var end = LocalTime.now().toNanoOfDay();
+        var delta = (end - start) / 1000000;
         while (true) {
-          var start = LocalTime.now().toNanoOfDay();
-          key = context.pollEvent();
-          if (key != null && key.getAction() == Action.KEY_PRESSED) {
-            if (KeyboardKey.UP == key.getKey() || KeyboardKey.DOWN == key.getKey() || KeyboardKey.LEFT == key.getKey()
-                || KeyboardKey.RIGHT == key.getKey())
-              world.player().move(world, key);
-
-            else if (!isInventoryVisible && key.getKey() == KeyboardKey.I) {
-              // Afficher l'inventaire
-              isInventoryVisible = true;
-              display.displayInventory(world, context, cachedImages);
-              int pressCount = 0;
-
-              do {
-                key = context.pollEvent();
-                if (key != null && key.getKey() == KeyboardKey.I) {
-                  pressCount++;
+          start = LocalTime.now().toNanoOfDay();
+          event = context.pollOrWaitEvent(characterMoveCooldown);
+          KeyboardKey key = null;
+          if (event != null && event.getAction() == Action.KEY_PRESSED) {
+            if (AcceptedKeys.isMovementKey((key = event.getKey()))) {
+              if ((moved = world.player().move(world, key))) {
+                Position tmp = world.player().triedToGo();
+                Friend friend = null;
+                if (world.player().getPreviousPosition() != tmp && (friend = world.friendAt(tmp)) != null) {
+                  Display.tradeLoop(world, cachedImages, context, display, friend);
                 }
-              } while (pressCount < 2);
+              }
+            } else if (key == KeyboardKey.I && event.getAction() == Action.KEY_PRESSED) {
+              Display.inventoryLoop(world, cachedImages, context, display);
 
-              // Cacher l'inventaire
-              isInventoryVisible = false;
-              display.hideInventory(world, context, display, cachedImages);
-
-            } else if (key.getKey() == KeyboardKey.Q) {
+            } else if (key == KeyboardKey.Q) {
               break;
             }
+            event = null;
           }
-          if (key != null)
+
+          if ((cooldown += (LocalTime.now().toNanoOfDay() - start) / 1000000) > characterMoveCooldown) {
+            moved = moved || world.update();
+            if (world.player().getHealth() <= 0) {
+              Display.gameOverLoop(world, cachedImages, context, display);
+              break;
+            }
+            cooldown = 0;
+          }
+
+          if (moved) {
             context.renderFrame(graphics -> {
-              // graphics.clearRect(0, 0, (int) context.getScreenInfo().getWidth(), (int)
-              // context.getScreenInfo().getHeight());
               graphics.setColor(Color.WHITE);
+              Display.clearScreen(graphics, context, display);
               Display.drawWorld(graphics, display, cachedImages, world);
             });
-          while (context.pollEvent() != null) {
           }
-          key = null;
-          var end = LocalTime.now().toNanoOfDay();
-          var delta = (end - start) / 1000000;
+          end = LocalTime.now().toNanoOfDay();
+          delta = (end - start) / 1000000;
           if (delta < frequency) {
             try {
-              Thread.sleep(frequency - delta);
+              Thread.sleep(frequency - delta); // sleep in ms
             } catch (InterruptedException e) {
-              e.printStackTrace();
+              System.err.println(e.getMessage());
             }
           }
+          moved = false;
         }
         context.exit(0);
-        System.out.println(world);
       });
-
     } catch (Exception e) {
-      e.printStackTrace();
+      System.err.println(e.getMessage());
+      System.err.println("Error while running Zen5");
     }
 
   }
-
 }

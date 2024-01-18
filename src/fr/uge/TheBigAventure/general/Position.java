@@ -13,6 +13,14 @@ public class Position {
     return "(" + x + "," + y + ")";
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Position))
+      return false;
+    Position position = (Position) o;
+    return x == position.x && y == position.y;
+  }
+
   public static Position valueOf(String position) {
     String[] tmp = position.replaceAll("[\\(\\) ]", "").split(",");
     int x = Integer.parseInt(tmp[0]);
@@ -22,12 +30,25 @@ public class Position {
     return new Position(x, y);
   }
 
+  public static boolean moveIfFree(World world, Position position, int x, int y) {
+    if (world.isFree(x, y)) {
+      position.setX(x);
+      position.setY(y);
+      return true;
+    }
+    return false;
+  }
+
   public int getX() {
     return x;
   }
 
   public int getY() {
     return y;
+  }
+
+  public int distance(Position position) {
+    return Math.abs(x - position.x) + Math.abs(y - position.y);
   }
 
   public void setX(int x) {
@@ -40,5 +61,9 @@ public class Position {
     if (y < 0)
       throw new IllegalArgumentException("y must be positive");
     this.y = y;
+  }
+
+  public static Position getPositionCopy(Position position) {
+    return new Position(position.getX(), position.getY());
   }
 }

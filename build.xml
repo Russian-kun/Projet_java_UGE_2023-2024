@@ -2,51 +2,58 @@
 <project name="TheBigAdventure" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <!-- Proprietes -->
-    <property name="src.dir" value="src"/>
-    <property name="maps.dir" value="maps"/>
-    <property name="docs.dir" value="docs"/>
-    <property name="build.dir" value="."/>
-    <property name="classes.dir" value="${build.dir}/classes"/>
-    <property name="lib.dir" value="lib"/>
-    <property name="jar.dir" value="${build.dir}/jar"/>
-    
+    <property name="src.dir" value="src" />
+    <property name="docs.dir" value="docs" />
+    <property name="build.dir" value="." />
+    <property name="lib.dir" value="lib" />
+    <property name="classes.dir" value="${build.dir}/classes" />
+    <property name="jar.dir" value="${build.dir}/jar" />
+    <property name="resources.dir" value="resources" />
+    <property name="maps.dir" value="${resources.dir}/maps" />
+    <property name="images.dir" value="${resources.dir}/images" />
+
     <!-- Tache pour compiler les sources -->
     <target name="compile">
-        <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}">
+        <mkdir dir="${classes.dir}" />
+        <javac source="21" target="21" includeantruntime="false"
+            srcdir="${src.dir}" destdir="${classes.dir}">
             <classpath>
-                <fileset dir="${lib.dir}" includes="*.jar"/>
+                <fileset dir="${lib.dir}" includes="*.jar" />
             </classpath>
         </javac>
     </target>
 
+    <target name="build" depends="compile,jar">
+        <echo message="Build completed successfully." />
+    </target>
+
     <!-- Tâche pour créer le jar exécutable -->
     <target name="jar" depends="compile">
-        <mkdir dir="${jar.dir}"/>
+        <mkdir dir="${jar.dir}" />
         <jar destfile="${jar.dir}/thebigadventure.jar" manifest="${basedir}/manifest.mf">
-            <fileset dir="${classes.dir}"/>
-            <fileset dir="${lib.dir}" includes="*.jar"/>
-            <fileset dir="${maps.dir}" includes="*.map"/>
+            <fileset dir="${classes.dir}" />
+            <fileset dir="${lib.dir}" />
+            <fileset dir="${resources.dir}" />
         </jar>
     </target>
 
 
     <!-- Tache pour generer la Javadoc -->
     <target name="javadoc" depends="compile">
-        <mkdir dir="${docs.dir}/api"/>
+        <mkdir dir="${docs.dir}/api" />
         <javadoc sourcepath="${src.dir}" destdir="${docs.dir}/api">
             <classpath>
-                <fileset dir="${lib.dir}" includes="*.jar"/>
-                <fileset dir="${classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="*.jar" />
+                <fileset dir="${classes.dir}" />
             </classpath>
         </javadoc>
     </target>
 
     <!-- Tache pour nettoyer le projet -->
     <target name="clean">
-        <delete dir="${classes.dir}"/>
-        <delete dir="${jar.dir}"/>
-        <delete dir="${docs.dir}/api"/>
+        <delete dir="${classes.dir}" />
+        <delete dir="${jar.dir}" />
+        <delete dir="${docs.dir}/api" />
     </target>
 
 </project>
