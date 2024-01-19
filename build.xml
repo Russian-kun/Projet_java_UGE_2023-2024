@@ -31,8 +31,8 @@
     <target name="jar" depends="compile">
         <mkdir dir="${jar.dir}" />
         <jar destfile="${jar.dir}/thebigadventure.jar" manifest="${basedir}/manifest.mf">
+            <zipgroupfileset dir="lib" includes="zen5.jar" />
             <fileset dir="${classes.dir}" />
-            <fileset dir="${lib.dir}" />
             <fileset dir="${resources.dir}" />
         </jar>
     </target>
